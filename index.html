@@ -6,11 +6,27 @@
         text-align: center;
       }
     </style>
+
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
   </head>
   <body>
+    <!-- A navbar -->
+    <div class="navbar">
+      <div class="navbar-inner">
+        <a class="brand" href="#">CSE 150 D-Separation Graph</a>
+        <ul class="nav">
+          <li class="active"><a href="#"><i class="icon-home"></i> Home</a></li>
+          <li><a href="#"><i class="icon-book"></i> Course Home Page</a></li>
+          <li><a href="#"><i class="icon-search"></i> Useful Links</a></li>
+        </ul>
+      </div>
+    </div>
+
+
     <canvas id="viewport" width="800" height="400"></canvas>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    <script src="js/bootstrap.js"></script>
     
     <script src="lib/arbor.js"></script>
     <script src="_/graphics.js"></script>
@@ -467,19 +483,19 @@
       }
 
     </script>
-    <p> black is for normal, red is for evidence, blue for X set, and green for Y set
-    <table border="2">
+    <p class="text-info">black is for normal, red is for evidence, blue for X set, and green for Y set</p>
+    <table class="table table-condensed table-striped table-hover">
+      <!--<col width="100">
       <col width="100">
       <col width="100">
       <col width="100">
-      <col width="100">
-      <col width="100">
+      <col width="100">-->
       <tr>
         <th>Node</th>
         <th>X</th>
         <th>Y</th>
         <th>E</th>
-        <th>clear</th>
+        <th>Clear</th>
       </tr>
       <tr>
         
@@ -628,11 +644,11 @@
       </tr>
 
       </table>
-      <button type="button" onclick="init();">Start</button>
-      <button type="button" onclick="update();">Refresh</button>
-
-      <input type="submit" name="submit" >
-
+      <center>
+      <button class="btn btn-primary" type="button" onclick="init();">Start</button>
+      <button class="btn btn-success" type="button" onclick="update();">Refresh</button>
+      <input class="btn btn-info" type="submit" name="submit" >
+      </center>
 
   </body>
 </html>
