@@ -111,7 +111,7 @@
           var tmp = EdgeList[i];
           var from = particleSystem.getNode(tmp.from);
           var to = particleSystem.getNode(tmp.to);
-          particleSystem.addEdge(from, to, {weight: 2, name: tmp.name});
+          particleSystem.addEdge(from, to, {weight: 2, name: tmp.name, highlighted: tmp.highlighted});
         }
     
         ctx.fillStyle = "white"
@@ -153,7 +153,11 @@
           ctx.save() 
           ctx.beginPath()
           ctx.lineWidth = (!isNaN(weight)) ? parseFloat(weight) : 1
-          ctx.strokeStyle = "#cccccc"
+
+          if(edge.data.highlighted)
+            ctx.strokeStyle = "#99FFFF"
+          else
+            ctx.strokeStyle = "#cccccc"
           ctx.fillStyle = null
 
           ctx.moveTo(start[0], start[1])//Tail
@@ -325,7 +329,7 @@
         NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH];
 
 
-        edgeAC = new Edge("AC", "A", "C", false);  
+        edgeAC = new Edge("AC", "A", "C", true);  
         edgeCF = new Edge("CF", "C", "F", false);
         edgeBF = new Edge("BF", "B", "F", false);
         edgeCG = new Edge("CG", "C", "G", false);
