@@ -533,6 +533,28 @@
         }
         
       }
+      function currentNodesEdge(node){
+        var tmp = [];
+        var index = 0;
+        for(var i = 0; i < EdgeList.length; i++){
+          if(EdgeList[i].name.indexOf(node.name) != -1){
+            tmp[index] = EdgeList[i];
+            index++;
+          }
+        }
+        return tmp;
+        //alert("hello" + tmp);
+      }
+      function allPath(){
+        for(var i = 0; i < NodeList.length; i++){
+          var current = NodeList[i];
+          var tmp = currentNodesEdge(current);
+          for(var j = 0; j < tmp.length; j++){
+            console.log(tmp[j].name);
+          }
+          console.log("\n\n\n");
+        }
+      }
 
     </script>
     <div class="span12">
@@ -705,7 +727,7 @@
           <button class="btn btn-success" type="button" onclick="update();">Refresh</button>
         </div>
         <div class="span2">
-          <button class="btn btn-info" type="button" name="submit" >Submit</button>
+          <button class="btn btn-info" type="button" name="submit" onClick="allPath();">Submit</button>
         </div>
       </div>
     </div>
