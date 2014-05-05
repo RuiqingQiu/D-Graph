@@ -23,7 +23,7 @@
     </div>
 
 
-    <canvas id="viewport" width="800" height="400"></canvas>
+    <canvas id="viewport" width="1000" height="400"></canvas>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
@@ -43,8 +43,9 @@
       var nodeG;
       var nodeH;
       var NodeList = [];
-
+      var ExampleNodeList = [];
       var EdgeList = [];
+      var ExampleEdgeList = [];
       var edgeAC; 
       var edgeCF; 
       var edgeBF; 
@@ -73,10 +74,11 @@
       /**
        * Class: Edge
        **/
-       function Edge(name, from, to, highlighted){
+       function Edge(name, from, to, highlighted, rule){
         this.name = name;
         this.from = from;
         this.to = to;
+        this.rule = rule;
         this.highlighted = highlighted;
        }
 
@@ -123,11 +125,21 @@
           var tmp = NodeList[i];
           particleSystem.addNode(tmp.name, {name: tmp.name, x: tmp.x, y: tmp.y, mass: 2, evidence: tmp.evidence, target: tmp.target, targetY: tmp.targetY});
         }
+        for(var i = 0; i < ExampleNodeList.length; i++){
+          var tmp = ExampleNodeList[i];
+          particleSystem.addNode(tmp.name, {name: tmp.name, x: tmp.x, y: tmp.y, mass: 2, evidence: tmp.evidence, target: tmp.target, targetY: tmp.targetY});
+        }
         for (var i = 0; i < EdgeList.length; i++){
           var tmp = EdgeList[i];
           var from = particleSystem.getNode(tmp.from);
           var to = particleSystem.getNode(tmp.to);
-          particleSystem.addEdge(from, to, {weight: 2, name: tmp.name, highlighted: tmp.highlighted});
+          particleSystem.addEdge(from, to, {weight: 2, name: tmp.name, highlighted: tmp.highlighted, rule: tmp.rule});
+        }
+        for(var i = 0; i < ExampleEdgeList.length; i++){
+          var tmp = ExampleEdgeList[i];
+          var from = particleSystem.getNode(tmp.from);
+          var to = particleSystem.getNode(tmp.to);
+          particleSystem.addEdge(from, to, {weight: 2, name: tmp.name, highlighted: tmp.highlighted, rule: tmp.rule});
         }
     
         ctx.fillStyle = "white"
@@ -152,7 +164,7 @@
           //ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)
           ctx.beginPath()
           ctx.arc(node.p.x, node.p.y, 10, 0, 2*Math.PI);
-          ctx.fillText(node.data.name, node.p.x+10, node.p.y);
+          ctx.fillText(node.data.name, node.p.x+10, node.p.y-3);
           ctx.fill();
           nodeBoxes[node.name] = [node.p.x, node.p.y, 22, 15]
         })   
@@ -179,14 +191,21 @@
           ctx.moveTo(start[0], start[1])//Tail
           var endx = end[0]
           var endy = end[1]
-          if(start[0] > end[0]){//The node is on the left side
+          if(start[0] > end[0] && start[1] == end[1]){
+            endx = end[0] + 12;
+          }
+          else if(start[0] > end[0]){//The node is on the left side
             endx = end[0] + 10;
             endy = end[1] - 10;
-          }                     
+          }
+          else if(start[1] == end[1] && start[0] < end[0]){
+            endx = end[0] - 12;
+          }                  
           else{
             endx = end[0] - 10;
             endy = end[1] - 10;
           }
+
           //ctx.lineTo(end[0]-5, end[1]-5)//Head
           ctx.lineTo(endx, endy)
 
@@ -311,6 +330,9 @@
     sys.parameters({gravity:true}) // use center-gravity to make the graph settle nicely (ymmv)
     sys.renderer = Renderer("#viewport") // our newly created renderer will have its .init() method called shortly by sys...
 
+    
+
+
     // add some nodes to the graph and watch it go...
     // or, equivalently:
     //
@@ -342,18 +364,48 @@
         nodeF = new Node("F", 150, 300, 2, false, false, false);
         nodeG = new Node("G", 350, 300, 2, false,  false, false);
         nodeH = new Node("H", 550, 300, 2, false,  false, false);
-        NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH];
+
+        //Here's for the three possible blocking path
+
+        //Rule #1, intervening cause
+        node1 = new Node("1", 720, 50, 2, false, false, false);
+        node2 = new Node("2", 795, 50, 2, true, false, false);
+        node3 = new Node("3", 870, 50, 2, false, false, false);
+        edge12 = new Edge("12", "1", "2", false, true);
+        edge23 = new Edge("23", "2", "3", false, true);
+        //Rule #2, comman cause
+        node4 = new Node("4", 720, 150, 2, false, false, false);
+        node5 = new Node("5", 795, 150, 2, true, false, false);
+        node6 = new Node("6", 870, 150, 2, false, false, false);
+
+        edge54 = new Edge("54", "5", "4", false, true);
+        edge56 = new Edge("56", "5", "6", false, true);
+        //Rule #3, no observed common effect
+        node7 = new Node("7", 720, 250, 2, false, false, false);
+        node8 = new Node("8", 795, 250, 2, false, false, false);
+        node9 = new Node("9", 870, 250, 2, false, false, false);
+        node10 = new Node("W", 760, 300, 2, false, false, false);
+        node11 = new Node("K", 835, 300, 2, false, false, false);
+        
+        edge78 = new Edge("78", "7", "8", false, true);
+        edge98 = new Edge("98", "9", "8", false, true);
+        edge8W = new Edge("8W", "8", "W", false, true);
+        edge8K = new Edge("8K", "8", "K", false, true);
+
+        NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH] 
+        ExampleNodeList = [node1, node2, node3, node4, node5, node6, node7, node8, node9, node10, node11];
 
 
-        edgeAC = new Edge("AC", "A", "C", true);  
-        edgeCF = new Edge("CF", "C", "F", false);
-        edgeBF = new Edge("BF", "B", "F", false);
-        edgeCG = new Edge("CG", "C", "G", false);
-        edgeAD = new Edge("AD", "A", "D", false);
-        edgeDG = new Edge("DG", "D" ,"G", false);
-        edgeDH = new Edge("DH", "D", "H", false);
-        edgeEH = new Edge("EH", "E", "H", false);
-        EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH];
+        edgeAC = new Edge("AC", "A", "C", true, false);  
+        edgeCF = new Edge("CF", "C", "F", false, false);
+        edgeBF = new Edge("BF", "B", "F", false, false);
+        edgeCG = new Edge("CG", "C", "G", false, false);
+        edgeAD = new Edge("AD", "A", "D", false, false);
+        edgeDG = new Edge("DG", "D" ,"G", false, false);
+        edgeDH = new Edge("DH", "D", "H", false, false);
+        edgeEH = new Edge("EH", "E", "H", false, false);
+        EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH]
+        ExampleEdgeList = [edge12, edge23, edge54, edge56, edge78, edge98, edge8K, edge8W];
 
         alert("init");
       }
@@ -483,13 +535,11 @@
       }
 
     </script>
-    <p class="text-info">black is for normal, red is for evidence, blue for X set, and green for Y set</p>
-    <table class="table table-condensed table-striped table-hover">
-      <!--<col width="100">
-      <col width="100">
-      <col width="100">
-      <col width="100">
-      <col width="100">-->
+    <div class="span12">
+       <p class="text-info">black is for normal, red is for evidence, blue for X set, and green for Y set</p>
+    </div>
+    <div class="span8">
+    <table class="table table-bordered table-condensed table-striped table-hover">
       <tr>
         <th>Node</th>
         <th>X</th>
@@ -644,11 +694,21 @@
       </tr>
 
       </table>
-      <center>
-      <button class="btn btn-primary" type="button" onclick="init();">Start</button>
-      <button class="btn btn-success" type="button" onclick="update();">Refresh</button>
-      <input class="btn btn-info" type="submit" name="submit" >
-      </center>
+    </div>
+    <div class="row-fluid">
+      <div class="span12">
+        <div class="span1"></div>
+        <div class="span1">
+          <button class="btn btn-primary" type="button" onclick="init();">Start</button>
+        </div>
+        <div class="span1">
+          <button class="btn btn-success" type="button" onclick="update();">Refresh</button>
+        </div>
+        <div class="span2">
+          <button class="btn btn-info" type="button" name="submit" >Submit</button>
+        </div>
+      </div>
+    </div>
 
   </body>
 </html>
