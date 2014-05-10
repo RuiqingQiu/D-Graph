@@ -59,7 +59,7 @@
       /**
        * Class: Node
        **/
-      function Node(name, x, y, mass, evidence, target, targetY){
+      function Node(name, x, y, mass, evidence, target, targetY, visited){
         this.name = name;
         this.x = x;
         this.y = y;
@@ -70,6 +70,7 @@
         this.target = target;
         //Green for y set
         this.targetY = targetY;
+        this.visited = visited;
       }
       /**
        * Class: Edge
@@ -356,14 +357,14 @@
       //Init condition, set up edges and nodes
       function init(){
         //name, x, y, mass, evidence, target, targetY){
-        nodeA = new Node("A", 350, 100, 2, false,  false, false);
-        nodeB = new Node("B", 50,  200,  2, false, false, false);
-        nodeC = new Node("C", 250, 200, 2, false,  false, false);
-        nodeD = new Node("D", 450, 200, 2, false, false, false);
-        nodeE = new Node("E", 650, 200, 2, false, false, false);
-        nodeF = new Node("F", 150, 300, 2, false, false, false);
-        nodeG = new Node("G", 350, 300, 2, false,  false, false);
-        nodeH = new Node("H", 550, 300, 2, false,  false, false);
+        nodeA = new Node("A", 350, 100, 2, false,  false, false, false);
+        nodeB = new Node("B", 50,  200,  2, false, false, false, false);
+        nodeC = new Node("C", 250, 200, 2, false,  false, false, false);
+        nodeD = new Node("D", 450, 200, 2, false, false, false, false);
+        nodeE = new Node("E", 650, 200, 2, false, false, false, false);
+        nodeF = new Node("F", 150, 300, 2, false, false, false, false);
+        nodeG = new Node("G", 350, 300, 2, false,  false, false, false);
+        nodeH = new Node("H", 550, 300, 2, false,  false, false, false);
 
         //Here's for the three possible blocking path
 
@@ -418,142 +419,226 @@
 
         //Node A update
         if(document.getElementById('nodeA_X').checked){
-          nodeA = new Node("A", 350, 100, 2, false,  true, false);
+          nodeA = new Node("A", 350, 100, 2, false,  true, false, false);
           NodeList[0] = nodeA;
         }
         else if(document.getElementById('nodeA_Y').checked){
-          nodeA = new Node("A", 350, 100, 2, false, false,  true);
+          nodeA = new Node("A", 350, 100, 2, false, false, true, false);
           NodeList[0] = nodeA;
         }
         else if(document.getElementById('nodeA_E').checked){
-          nodeA = new Node("A", 350, 100, 2, true, false,  false);
+          nodeA = new Node("A", 350, 100, 2, true, false, false, false);
           NodeList[0] = nodeA;
         }
 
 
         //Node B update
         if(document.getElementById('nodeB_X').checked){
-          nodeB = new Node("B", 50, 200, 2, false,  true, false);
+          nodeB = new Node("B", 50, 200, 2, false,  true, false, false);
           NodeList[1] = nodeB;
         }
         else if(document.getElementById('nodeB_Y').checked){
-          nodeB = new Node("B", 50, 200, 2, false, false,  true);
+          nodeB = new Node("B", 50, 200, 2, false, false,  true, false);
           NodeList[1] = nodeB;
         }
         else if(document.getElementById('nodeB_E').checked){
-          nodeB = new Node("B", 50, 200, 2, true, false,  false);
+          nodeB = new Node("B", 50, 200, 2, true, false,  false, false);
           NodeList[1] = nodeB;
         }
 
 
         //Node C update
         if(document.getElementById('nodeC_X').checked){
-          nodeC = new Node("C", 250, 200, 2, false,  true, false);
+          nodeC = new Node("C", 250, 200, 2, false,  true, false, false);
           NodeList[2] = nodeC;
         }
         else if(document.getElementById('nodeC_Y').checked){
-          nodeC = new Node("C", 250, 200, 2, false, false,  true);
+          nodeC = new Node("C", 250, 200, 2, false, false,  true, false);
           NodeList[2] = nodeC;
         }
         else if(document.getElementById('nodeC_E').checked){
-          nodeC = new Node("C", 250, 200, 2, true, false,  false);
+          nodeC = new Node("C", 250, 200, 2, true, false,  false, false);
           NodeList[2] = nodeC;
         }
 
 
         //Node D update
         if(document.getElementById('nodeD_X').checked){
-          nodeD = new Node("D", 450, 200, 2, false,  true, false);
+          nodeD = new Node("D", 450, 200, 2, false,  true, false, false);
           NodeList[3] = nodeD;
         }
         else if(document.getElementById('nodeD_Y').checked){
-          nodeD = new Node("D", 450, 200, 2, false, false,  true);
+          nodeD = new Node("D", 450, 200, 2, false, false,  true, false);
           NodeList[3] = nodeD;
         }
         else if(document.getElementById('nodeD_E').checked){
-          nodeD = new Node("D", 450, 200, 2, true, false,  false);
+          nodeD = new Node("D", 450, 200, 2, true, false,  false, false);
           NodeList[3] = nodeD;
         }
 
         //Node E update
         if(document.getElementById('nodeE_X').checked){
-          nodeE = new Node("E", 650, 200, 2, false,  true, false);
+          nodeE = new Node("E", 650, 200, 2, false,  true, false, false);
           NodeList[4] = nodeE;
         }
         else if(document.getElementById('nodeE_Y').checked){
-          nodeE = new Node("E", 650, 200, 2, false, false,  true);
+          nodeE = new Node("E", 650, 200, 2, false, false,  true, false);
           NodeList[4] = nodeE;
         }
         else if(document.getElementById('nodeE_E').checked){
-          nodeE = new Node("E", 650, 200, 2, true, false,  false);
+          nodeE = new Node("E", 650, 200, 2, true, false,  false, false);
           NodeList[4] = nodeE;
         }
 
 
         //Node F update
         if(document.getElementById('nodeF_X').checked){
-          nodeF = new Node("F", 150, 300, 2, false,  true, false);
+          nodeF = new Node("F", 150, 300, 2, false,  true, false, false);
           NodeList[5] = nodeF;
         }
         else if(document.getElementById('nodeF_Y').checked){
-          nodeF = new Node("F", 150, 300, 2, false, false,  true);
+          nodeF = new Node("F", 150, 300, 2, false, false,  true, false);
           NodeList[5] = nodeF;
         }
         else if(document.getElementById('nodeF_E').checked){
-          nodeF = new Node("F", 150, 300, 2, true, false,  false);
+          nodeF = new Node("F", 150, 300, 2, true, false,  false, false);
           NodeList[5] = nodeF;
         }
 
         //Node G update
         if(document.getElementById('nodeG_X').checked){
-          nodeG = new Node("G", 350, 300, 2, false,  true, false);
+          nodeG = new Node("G", 350, 300, 2, false,  true, false, false);
           NodeList[6] = nodeG;
         }
         else if(document.getElementById('nodeG_Y').checked){
-          nodeG = new Node("G", 350, 300, 2, false, false,  true);
+          nodeG = new Node("G", 350, 300, 2, false, false,  true, false);
           NodeList[6] = nodeG;
         }
         else if(document.getElementById('nodeG_E').checked){
-          nodeG = new Node("G", 350, 300, 2, true, false,  false);
+          nodeG = new Node("G", 350, 300, 2, true, false,  false, false);
           NodeList[6] = nodeG;
         }
 
         //Node H update
         if(document.getElementById('nodeH_X').checked){
-          nodeH = new Node("H", 550, 300, 2, false,  true, false);
+          nodeH = new Node("H", 550, 300, 2, false,  true, false, false);
           NodeList[7] = nodeH;
         }
         else if(document.getElementById('nodeH_Y').checked){
-          nodeH = new Node("H", 550, 300, 2, false, false,  true);
+          nodeH = new Node("H", 550, 300, 2, false, false,  true, false);
           NodeList[7] = nodeH;
         }
         else if(document.getElementById('nodeH_E').checked){
-          nodeH = new Node("H", 550, 300, 2, true, false,  false);
+          nodeH = new Node("H", 550, 300, 2, true, false,  false, false);
           NodeList[7] = nodeH;
         }
         
       }
+
+      function clearNodeVisit(){
+        for(var i = 0; i < NodeList.length; i++){
+          NodeList[i].visited = false;
+        }
+      }
+      //Check if all the nodes are visited
+      function checkIfAllVisited(){
+        for(var i = 0; i < NodeList.length; i++){
+          if (NodeList[i].visited == false)
+            return false;
+        }
+        console.log("return true from check all visited");
+        return true;
+      }
+      function checkIsEdgeContainVisitedNode(edge){
+        for(var i = 0; i < NodeList.length; i++){
+          if(NodeList[i].visited == true && 
+            edge.name.indexOf(NodeList[i].name) != -1)
+            return true;
+        }
+        return false;
+      }
+      //Return a list of edge that is adjacent to current node
+      //Ex: A will return AC & AD
       function currentNodesEdge(node){
+        if(node.visited == true){
+          console.log("return here");
+          return;
+        }
+        
         var tmp = [];
         var index = 0;
         for(var i = 0; i < EdgeList.length; i++){
+          //Find all edges that contain the name
           if(EdgeList[i].name.indexOf(node.name) != -1){
-            tmp[index] = EdgeList[i];
-            index++;
+            if(checkIsEdgeContainVisitedNode(EdgeList[i])){
+
+            }else{
+              tmp[index] = EdgeList[i];
+              index++;
+            }
           }
         }
-        return tmp;
-        //alert("hello" + tmp);
+        console.log("node that set to visited is : " + node.name);
+        node.visited = true;
+        for(var i = 0; i < tmp.length; i++){
+          console.log(tmp[i].name);
+        }
+        var empty = [];
+        var result =  empty.concat(tmp);
+        console.log("\n\n");
+        if(checkIfAllVisited() == false){
+          console.log("enter if");
+          for(var i = 0; i < tmp.length; i++){
+            result = result.concat(currentNodesEdge(findNodeByName(tmp[i].name.replace(node.name, ""))));
+          }
+        }
+        return result;
       }
-      function allPath(){
+
+      function printAllNotVisited(){
         for(var i = 0; i < NodeList.length; i++){
+          if(NodeList[i].visited == false){
+            console.log("haven't visited: " + NodeList[i].name);
+          }
+        }
+      }
+      
+      function allPath(){
+        for(var i = 0; i < 1; i++){
           var current = NodeList[i];
+          printAllNotVisited();
+          //NodeList[i].visited = true;
+          console.log("Path for " + current.name + " to other nodes");
           var tmp = currentNodesEdge(current);
           for(var j = 0; j < tmp.length; j++){
-            console.log(tmp[j].name);
+            if(typeof tmp[j] == "undefined"){
+              console.log("\n");
+            }else{
+              console.log(tmp[j].name);
+            }
           }
           console.log("\n\n\n");
+          clearNodeVisit();
+          console.log("called clear node");
         }
+      }
+      function printPath(){
+         for(var j = 0; j < tmp.length; j++){
+            console.log(tmp[j].name.replace(current.name, ""));
+            var tmp2 = currentNodesEdge(findNodeByName(tmp[j].name.replace(current.name, "")));
+            for(var k = 0; k < tmp2.length; k++){
+              console.log(tmp2[k].name.replace(current.name, ""));
+            }
+            console.log("returned from tmp2");
+          }
+      }
+      //This function will return the node based on the name provided
+      function findNodeByName(str){
+        for(var i = 0; i < NodeList.length; i++){
+          if(NodeList[i].name == str)
+            return NodeList[i];
+        }
+        return null;
       }
 
     </script>
