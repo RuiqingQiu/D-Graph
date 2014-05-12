@@ -132,6 +132,7 @@
         }
         for (var i = 0; i < EdgeList.length; i++){
           var tmp = EdgeList[i];
+          //console.log(tmp.highlighted);
           var from = particleSystem.getNode(tmp.from);
           var to = particleSystem.getNode(tmp.to);
           particleSystem.addEdge(from, to, {weight: 2, name: tmp.name, highlighted: tmp.highlighted, rule: tmp.rule});
@@ -181,12 +182,18 @@
           var end = nodeBoxes[edge.data.name.charAt(1)]
           ctx.save() 
           ctx.beginPath()
-          ctx.lineWidth = (!isNaN(weight)) ? parseFloat(weight) : 1
-
-          if(edge.data.highlighted)
-            ctx.strokeStyle = "#99FFFF"
-          else
+          ctx.lineWidth = (!isNaN(weight)) ? parseFloat(weight) : 1;
+          var currentEdge = findEdgeByName(edge.data.name)
+          if(currentEdge != null){
+            if(currentEdge.highlighted)
+              ctx.strokeStyle = "#99FFFF"
+            else
+              ctx.strokeStyle = "#cccccc"
+          }
+          else{
             ctx.strokeStyle = "#cccccc"
+          }
+          
           ctx.fillStyle = null
 
           ctx.moveTo(start[0], start[1])//Tail
@@ -397,7 +404,7 @@
         ExampleNodeList = [node1, node2, node3, node4, node5, node6, node7, node8, node9, node10, node11];
 
 
-        edgeAC = new Edge("AC", "A", "C", true, false);  
+        edgeAC = new Edge("AC", "A", "C", false, false);  
         edgeCF = new Edge("CF", "C", "F", false, false);
         edgeBF = new Edge("BF", "B", "F", false, false);
         edgeCG = new Edge("CG", "C", "G", false, false);
@@ -413,7 +420,9 @@
       //Function update listen to the radio button clicked and update
       //the node as required.
       function update(){
-
+        for(var i = 0; i < EdgeList.length; i++){
+          EdgeList[i].highlighted = false;
+        }
         //Case for node A
         var radios = document.getElementById('nodeA_X');
 
@@ -430,7 +439,10 @@
           nodeA = new Node("A", 350, 100, 2, true, false, false, false);
           NodeList[0] = nodeA;
         }
-
+        else if(document.getElementById('nodeA_C').checked){
+          nodeA = new Node("A", 350, 100, 2, false, false, false, false);
+          NodeList[0] = nodeA;
+        }
 
         //Node B update
         if(document.getElementById('nodeB_X').checked){
@@ -445,6 +457,11 @@
           nodeB = new Node("B", 50, 200, 2, true, false,  false, false);
           NodeList[1] = nodeB;
         }
+        else if(document.getElementById('nodeB_C').checked){
+          nodeB = new Node("B", 50, 200, 2, false, false,  false, false);
+          NodeList[1] = nodeB;
+        }
+
 
 
         //Node C update
@@ -460,6 +477,11 @@
           nodeC = new Node("C", 250, 200, 2, true, false,  false, false);
           NodeList[2] = nodeC;
         }
+        else if(document.getElementById('nodeC_C').checked){
+          nodeC = new Node("C", 250, 200, 2, false, false,  false, false);
+          NodeList[2] = nodeC;
+        }
+
 
 
         //Node D update
@@ -475,6 +497,11 @@
           nodeD = new Node("D", 450, 200, 2, true, false,  false, false);
           NodeList[3] = nodeD;
         }
+        else if(document.getElementById('nodeD_C').checked){
+          nodeD = new Node("D", 450, 200, 2, false, false,  false, false);
+          NodeList[3] = nodeD;
+        }
+
 
         //Node E update
         if(document.getElementById('nodeE_X').checked){
@@ -487,6 +514,10 @@
         }
         else if(document.getElementById('nodeE_E').checked){
           nodeE = new Node("E", 650, 200, 2, true, false,  false, false);
+          NodeList[4] = nodeE;
+        }
+        else if(document.getElementById('nodeE_C').checked){
+          nodeE = new Node("E", 650, 200, 2, false, false,  false, false);
           NodeList[4] = nodeE;
         }
 
@@ -504,6 +535,10 @@
           nodeF = new Node("F", 150, 300, 2, true, false,  false, false);
           NodeList[5] = nodeF;
         }
+        else if(document.getElementById('nodeF_C').checked){
+         nodeF = new Node("F", 150, 300, 2, false, false,  false, false);
+          NodeList[5] = nodeF;
+        }
 
         //Node G update
         if(document.getElementById('nodeG_X').checked){
@@ -518,6 +553,10 @@
           nodeG = new Node("G", 350, 300, 2, true, false,  false, false);
           NodeList[6] = nodeG;
         }
+        else if(document.getElementById('nodeG_C').checked){
+          nodeG = new Node("G", 350, 300, 2, false, false,  false, false);
+          NodeList[6] = nodeG;
+        }
 
         //Node H update
         if(document.getElementById('nodeH_X').checked){
@@ -530,6 +569,10 @@
         }
         else if(document.getElementById('nodeH_E').checked){
           nodeH = new Node("H", 550, 300, 2, true, false,  false, false);
+          NodeList[7] = nodeH;
+        }
+        else if(document.getElementById('nodeH_C').checked){
+          nodeH = new Node("H", 550, 300, 2, false, false,  false, false);
           NodeList[7] = nodeH;
         }
         
@@ -557,6 +600,67 @@
         }
         return false;
       }
+
+      function FindCurrentNodesEdgeTo(current, to){
+        var done = false;
+        if(current.visited == true){
+          console.log("return here");
+          return;
+        }
+        
+        var tmp = [];
+        var index = 0;
+        for(var i = 0; i < EdgeList.length; i++){
+          //Find all edges that contain the name
+          if(EdgeList[i].name.indexOf(current.name) != -1){
+            if(checkIsEdgeContainVisitedNode(EdgeList[i])){
+
+            }else{
+              //The edge contain the node we want to find
+              if(EdgeList[i].name.indexOf(to) != -1){
+                tmp[index] = EdgeList[i];
+                done = true;
+                return tmp;
+              }else{
+                tmp[index] = EdgeList[i];
+                index++;
+              }
+            }
+          }
+        }
+        console.log("node that set to visited is : " + current.name);
+        current.visited = true;
+        for(var i = 0; i < tmp.length; i++){
+          console.log(tmp[i].name);
+        }
+        var empty = [];
+        var result =  empty.concat(tmp);
+        console.log("\n\n");
+        if(checkIfAllVisited() == false){
+          console.log("enter if node is not all visited");
+          for(var i = 0; i < tmp.length; i++){
+            var returnLst = FindCurrentNodesEdgeTo(findNodeByName(tmp[i].name.replace(current.name, "")), to);
+            if(returnLst == null || returnLst.length == 0){
+              result = result.concat(returnLst);
+            }
+            else {
+              for(var j = 0; j < returnLst.length; j++){
+
+                if(typeof returnLst[j] == "undefined"){
+                  continue;
+                }
+                else if(returnLst[j].name.indexOf(to) != -1){
+                  result = result.concat(returnLst);
+                  return result;
+                }
+              }
+              result = result.concat(returnLst);
+            }
+          }
+        }
+        return result;
+      }
+
       //Return a list of edge that is adjacent to current node
       //Ex: A will return AC & AD
       function currentNodesEdge(node){
@@ -602,9 +706,148 @@
           }
         }
       }
+
+      function printPathFromTo(from, to){
+        console.log("from: " + from + ", to: " + to);
+        var current = findNodeByName(from);
+        if(current == null){
+          return;
+        }
+        var lst = FindCurrentNodesEdgeTo(current,to);
+        for(var i = 0; i < lst.length; i++){
+          if(typeof lst[i] == "undefined"){
+              console.log("\n");
+              lst.splice(i, 1);
+          }else{
+              console.log("before getting path to : " + lst[i].name);
+          }
+        }
+        var tmp = gettingThePath(lst, from, to);
+        for(var i = 0; i < tmp.length; i++){
+          console.log("path to take : " + tmp[i].name);
+        }
+
+        //This part is for highlighting the edges
+        for(var j = 0; j < tmp.length; j++){
+          for(var i = 0; i < EdgeList.length; i++){
+            if(EdgeList[i].name.indexOf(tmp[j].name) != -1){
+              console.log("highlight " + EdgeList[i].name);
+              var tmpEdge = EdgeList[i];
+              EdgeList[i] = new Edge(tmpEdge.name, tmpEdge.from, tmpEdge.to, true, false);
+            }
+          }
+        }
+      }
+      
+      /*
+       * This is the function for getting a path from node A to B by giving all the possible edges and work from bottom up
+       */
+      function gettingThePath(lst, from, to){
+       
+        if(lst.length < 2)
+          return lst;
+        var end = lst[lst.length-1];
+        var endStr = end.name;
+        console.log("end is " + endStr);
+        console.log("to is " + to);   
+        endStr = endStr.replace(to, ""); 
+        var tmp_to = endStr;
+        console.log("now is " + endStr.replace(to, ""));
+        var stop = 0;
+        for(var j = lst.length -2; j >= 0; j--){
+          if(lst[j].name.indexOf(endStr) == -1){
+            console.log("here");
+            lst.splice(j, 1);
+          }else{
+            stop = j;
+            break;
+          }
+        }
+        console.log(lst);
+        var reset = true;
+        var tmpList = [];
+        if(reset){
+          for(var i = 0; i < lst.length; i ++){
+            tmpList[i] = lst[i];
+          }
+          reset = false;
+        }
+        while(stop > 0){
+          
+          console.log("\nanother iteration");
+          console.log(tmpList);
+          for(var i = 0; i < tmpList.length; i++){
+            console.log("lst contains: " + tmpList[i].name);
+          }
+          if(reset){
+            console.log("reset");
+            for(var i = 0; i < lst.length; i ++){
+              tmpList[i] = lst[i];
+            }
+            reset = false;
+          }else{
+            if(tmpList[stop].name.indexOf(from) != -1){
+              console.log("return since found");
+              console.log("current stop is " + stop);
+              for(var i = stop-1 ; i >= 0; i--){
+                tmpList.splice(i, 1);
+              }
+              return tmpList;
+            }
+          }
+          console.log("stop is " + stop);
+          end = tmpList[stop];
+          console.log(end);
+          endStr = end.name;
+          console.log("end is " + endStr);
+          console.log("tmp to is " + tmp_to);
+          endStr = endStr.replace(tmp_to, ""); 
+          tmp_to = endStr;
+          console.log("now is " + endStr);
+          for(var j = stop - 1; j >= 0; j--){
+            if(lst[j].name.indexOf(endStr) == -1){
+              console.log("here");
+              console.log("removing" + lst[j].name);
+              tmpList.splice(j, 1);
+              console.log("current j is " + j);
+              console.log(tmpList.length);
+              console.log(lst.length);
+            }else{
+              stop = j;
+              break;
+            }
+          }
+          if(j == -1){
+            stop = 0;
+          }
+          if(stop != 0){
+            console.log("continue, stop is " + stop);
+            continue;
+          }
+          if(tmpList[0].name.indexOf(from) == -1){
+            console.log("wrong path, reset");
+            reset = true;
+            lst.splice(lst.indexOf(tmpList[0]), 1);
+            stop = lst.length-1;
+            console.log("reset stop to " + stop);
+            tmp_to = to;
+          }else{
+            console.log("in return, tmp_to is " + tmp_to);
+            while(tmpList[0].name.indexOf(tmp_to) == -1){
+              tmpList.splice(0, 1);
+            }
+            stop = 0;
+            console.log("2_returning list");
+            return tmpList;
+          }
+        }
+        console.log(lst);
+        console.log("1_returning list");
+        return lst;
+      }
       
       function allPath(){
-        for(var i = 0; i < 1; i++){
+        for(var i = 0; i < NodeList.length; i++){
           var current = NodeList[i];
           printAllNotVisited();
           //NodeList[i].visited = true;
@@ -637,6 +880,30 @@
         for(var i = 0; i < NodeList.length; i++){
           if(NodeList[i].name == str)
             return NodeList[i];
+        }
+        return null;
+      }
+      function findEdgeByName(str){
+        for(var i = 0; i < EdgeList.length; i++){
+          if(EdgeList[i].name == str){
+            return EdgeList[i];
+          }
+        }
+      }
+
+      function getNodeMarkedX(){
+        for(var i = 0; i < NodeList.length; i++){
+          if(NodeList[i].target == true){
+            return NodeList[i].name;
+          }
+        }
+        return null;
+      }
+       function getNodeMarkedY(){
+        for(var i = 0; i < NodeList.length; i++){
+          if(NodeList[i].targetY == true){
+            return NodeList[i].name;
+          }
         }
         return null;
       }
@@ -813,6 +1080,9 @@
         </div>
         <div class="span2">
           <button class="btn btn-info" type="button" name="submit" onClick="allPath();">Submit</button>
+        </div>
+        <div class="span2">
+          <button class="btn btn-info" type="button" name="submit" onClick="printPathFromTo(getNodeMarkedX(), getNodeMarkedY());">Test</button>
         </div>
       </div>
     </div>
