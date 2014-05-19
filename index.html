@@ -412,7 +412,7 @@
         edgeDG = new Edge("DG", "D" ,"G", false, false);
         edgeDH = new Edge("DH", "D", "H", false, false);
         edgeEH = new Edge("EH", "E", "H", false, false);
-        EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH]
+        EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH];
         ExampleEdgeList = [edge12, edge23, edge54, edge56, edge78, edge98, edge8K, edge8W];
 
         alert("init");
@@ -714,6 +714,10 @@
           return;
         }
         var lst = FindCurrentNodesEdgeTo(current,to);
+        console.log(lst);
+        if(lst == null){
+          return
+        }
         for(var i = 0; i < lst.length; i++){
           if(typeof lst[i] == "undefined"){
               console.log("\n");
@@ -865,7 +869,7 @@
           console.log("called clear node");
         }
       }
-      function printPath(){
+      /*function printPath(){
          for(var j = 0; j < tmp.length; j++){
             console.log(tmp[j].name.replace(current.name, ""));
             var tmp2 = currentNodesEdge(findNodeByName(tmp[j].name.replace(current.name, "")));
@@ -874,7 +878,7 @@
             }
             console.log("returned from tmp2");
           }
-      }
+      }*/
       //This function will return the node based on the name provided
       function findNodeByName(str){
         for(var i = 0; i < NodeList.length; i++){
@@ -908,167 +912,296 @@
         return null;
       }
 
+      function D_Separation(){
+        //printPathFromTo(getNodeMarkedX(), getNodeMarkedY());
+        var visited = [];
+        visited[0] = getNodeMarkedX();
+        var end = getNodeMarkedY();
+        document.getElementById("result").innerHTML = "";
+        BreadthFirstSearch(visited, end);
+      }
+      function adjacentNodes(nodeX){
+        var adjacent = [];
+        var index = 0;
+        for(var i = 0; i < EdgeList.length; i++){
+          //Find all edges that contain the name
+          if(EdgeList[i].name.indexOf(nodeX) != -1){
+            var node = findNodeByName(EdgeList[i].name.replace(nodeX, ""));
+            adjacent[index] = node.name;
+            index++;
+          }
+        }
+        return adjacent;
+      }
+      function BreadthFirstSearch(visited, end){
+        //Getting the last element
+        var last_node = visited[visited.length-1];
+        //Getting the adjacent nodes
+        var adjacent = adjacentNodes(last_node);
+        for(var i =0; i < adjacent.length; i++){
+          var node = adjacent[i];
+          //Check if visited contains the current node
+          if(visited.indexOf(node) != -1){
+            continue;
+          }
+          //If it's found
+          if(node == end){
+            visited.push(node);
+            setTimeout(printPath(visited), 50000);
+            //printPath(visited);
+
+            visited.pop();
+          }
+        }
+         for(var i =0; i < adjacent.length; i++){
+            var node = adjacent[i];
+           if(visited.indexOf(node) != -1 || node == end){
+            continue;
+           }
+           visited.push(node);
+           BreadthFirstSearch(visited, end);
+           visited.pop();
+         }
+      }
+      function printPath(visited){       
+        var str = ""
+        for(var i = 0; i < visited.length; i++){
+          str += visited[i];
+        }
+        var isDependent = checkRules(visited);
+        var printOut = "";
+        if(isDependent == "Dependent"){
+          printOut = " <b class=\"text-warning\">Dependent</b>";
+        }else{
+          printOut = " <b class=\"text-success\">Independent</b>";
+        }
+        var result = document.getElementById("result").innerHTML += "<button class=\"btn\" onClick=\"highlightPath('"+str+"')\">Path : " + str + printOut + "</button><br/><br/>";
+      }
+      function checkRules(visited){
+        if(visited.length <= 2){
+          return "Dependent";
+        }
+        else{
+          //Check #1 
+          var EdgeTmp = []
+          for(var j = 0; j < visited.length; j++){
+            for(var i = 0; i < EdgeList.length; i++){
+              if(j+1 < visited.length && EdgeList[i].name.indexOf(visited[j]) != -1 && EdgeList[i].name.indexOf(visited[j+1]) != -1){
+                var tmpEdge = EdgeList[i];
+                EdgeTmp.push(tmpEdge);
+              }
+            }
+          }
+          console.log(EdgeTmp);
+          var index = 0;
+          for(var i = 0; i < EdgeTmp.length; i++){
+            var currentEdge = EdgeTmp[i];
+            if(visited[index] == currentEdge.from 
+              && visited[index+1] == currentEdge.to 
+              && visited[index+2] == EdgeTmp[index+1].to 
+              && findNodeByName(visited[index+1]).evidence == true)
+            {
+              return "Independent";
+            }
+            else if(visited[index+1] == currentEdge.to 
+              && visited[index+2] == EdgeTmp[index+1].from 
+              && visited[index+3] == EdgeTmp[index+1].to 
+              && findNodeByName(visited[index+2]).evidence == true){
+              return "Independent";
+            }
+            else{
+              index = index + 2;
+            }
+          }
+          return "Dependent";
+        }
+
+      }
+      function highlightPath(str){
+        edgeAC = new Edge("AC", "A", "C", false, false);  
+        edgeCF = new Edge("CF", "C", "F", false, false);
+        edgeBF = new Edge("BF", "B", "F", false, false);
+        edgeCG = new Edge("CG", "C", "G", false, false);
+        edgeAD = new Edge("AD", "A", "D", false, false);
+        edgeDG = new Edge("DG", "D" ,"G", false, false);
+        edgeDH = new Edge("DH", "D", "H", false, false);
+        edgeEH = new Edge("EH", "E", "H", false, false);
+        EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH];
+        //This part is for highlighting the edges
+        for(var j = 0; j < str.length; j++){
+          for(var i = 0; i < EdgeList.length; i++){
+            if(j+1 < str.length && EdgeList[i].name.indexOf(str.charAt(j)) != -1 && EdgeList[i].name.indexOf(str.charAt(j+1)) != -1){
+              var tmpEdge = EdgeList[i];
+              EdgeList[i] = new Edge(tmpEdge.name, tmpEdge.from, tmpEdge.to, true, false);
+            }
+          }
+        }
+      }
+
     </script>
     <div class="span12">
        <p class="text-info">black is for normal, red is for evidence, blue for X set, and green for Y set</p>
     </div>
-    <div class="span8">
-    <table class="table table-bordered table-condensed table-striped table-hover">
-      <tr>
-        <th>Node</th>
-        <th>X</th>
-        <th>Y</th>
-        <th>E</th>
-        <th>Clear</th>
-      </tr>
-      <tr>
-        
-        <td>
-         <label>A</label>
-        </td>
-         <td>
-          <input id="nodeA_X" type="radio" name="nodeA" value="X">
-        </td>
-         <td>
-          <input id="nodeA_Y" type="radio" name="nodeA" value="Y">
-        </td>
-         <td>
-          <input id="nodeA_E" type="radio" name="nodeA" value="E">
-        </td>
-         <td>
-          <input id="nodeA_C"type="radio" name="nodeA" value="C">
-        </td>
-      </tr>
+    <div class="span6">
+      <table class="table table-bordered table-condensed table-striped table-hover">
+        <tr>
+          <th>Node</th>
+          <th>X</th>
+          <th>Y</th>
+          <th>E</th>
+          <th>Clear</th>
+        </tr>
+        <tr>
+          
+          <td>
+           <label>A</label>
+          </td>
+           <td>
+            <input id="nodeA_X" type="radio" name="nodeA" value="X">
+          </td>
+           <td>
+            <input id="nodeA_Y" type="radio" name="nodeA" value="Y">
+          </td>
+           <td>
+            <input id="nodeA_E" type="radio" name="nodeA" value="E">
+          </td>
+           <td>
+            <input id="nodeA_C"type="radio" name="nodeA" value="C">
+          </td>
+        </tr>
 
 
-      <tr>
-        <td><label>B</label></td>
-        <td>
-          <input id="nodeB_X" type="radio" name="nodeB" value="B">
-        </td>
-         <td>
-          <input id="nodeB_Y" type="radio" name="nodeB" value="B">
-        </td>
-         <td>
-          <input id="nodeB_E" type="radio" name="nodeB" value="B">
-        </td>
-         <td>
-          <input id="nodeB_C" type="radio" name="nodeB" value="B">
-        </td>
-      </tr>
-      <tr>
-        <td><label>C</label></td>
-        <td>
-          <input id="nodeC_X" type="radio" name="nodeC" value="C">
-        </td>
-         <td>
-          <input id="nodeC_Y" type="radio" name="nodeC" value="C">
-        </td>
-         <td>
-          <input id="nodeC_E" type="radio" name="nodeC" value="C">
-        </td>
-         <td>
-          <input id="nodeC_C" type="radio" name="nodeC" value="C">
-        </td>
-      </tr>
+        <tr>
+          <td><label>B</label></td>
+          <td>
+            <input id="nodeB_X" type="radio" name="nodeB" value="B">
+          </td>
+           <td>
+            <input id="nodeB_Y" type="radio" name="nodeB" value="B">
+          </td>
+           <td>
+            <input id="nodeB_E" type="radio" name="nodeB" value="B">
+          </td>
+           <td>
+            <input id="nodeB_C" type="radio" name="nodeB" value="B">
+          </td>
+        </tr>
+        <tr>
+          <td><label>C</label></td>
+          <td>
+            <input id="nodeC_X" type="radio" name="nodeC" value="C">
+          </td>
+           <td>
+            <input id="nodeC_Y" type="radio" name="nodeC" value="C">
+          </td>
+           <td>
+            <input id="nodeC_E" type="radio" name="nodeC" value="C">
+          </td>
+           <td>
+            <input id="nodeC_C" type="radio" name="nodeC" value="C">
+          </td>
+        </tr>
 
-      <tr>
-        
-        <td>
-         <label>D</label>
-        </td>
-         <td>
-          <input id="nodeD_X" type="radio" name="nodeD" value="X">
-        </td>
-         <td>
-          <input id="nodeD_Y" type="radio" name="nodeD" value="Y">
-        </td>
-         <td>
-          <input id="nodeD_E" type="radio" name="nodeD" value="E">
-        </td>
-         <td>
-          <input id="nodeD_C"type="radio" name="nodeD" value="C">
-        </td>
-      </tr>
+        <tr>
+          
+          <td>
+           <label>D</label>
+          </td>
+           <td>
+            <input id="nodeD_X" type="radio" name="nodeD" value="X">
+          </td>
+           <td>
+            <input id="nodeD_Y" type="radio" name="nodeD" value="Y">
+          </td>
+           <td>
+            <input id="nodeD_E" type="radio" name="nodeD" value="E">
+          </td>
+           <td>
+            <input id="nodeD_C"type="radio" name="nodeD" value="C">
+          </td>
+        </tr>
 
-      <tr>
-        
-        <td>
-         <label>E</label>
-        </td>
-         <td>
-          <input id="nodeE_X" type="radio" name="nodeE" value="X">
-        </td>
-         <td>
-          <input id="nodeE_Y" type="radio" name="nodeE" value="Y">
-        </td>
-         <td>
-          <input id="nodeE_E" type="radio" name="nodeE" value="E">
-        </td>
-         <td>
-          <input id="nodeE_C" type="radio" name="nodeE" value="C">
-        </td>
-      </tr>
+        <tr>
+          
+          <td>
+           <label>E</label>
+          </td>
+           <td>
+            <input id="nodeE_X" type="radio" name="nodeE" value="X">
+          </td>
+           <td>
+            <input id="nodeE_Y" type="radio" name="nodeE" value="Y">
+          </td>
+           <td>
+            <input id="nodeE_E" type="radio" name="nodeE" value="E">
+          </td>
+           <td>
+            <input id="nodeE_C" type="radio" name="nodeE" value="C">
+          </td>
+        </tr>
 
-      <tr>
-        
-        <td>
-         <label>F</label>
-        </td>
-         <td>
-          <input id="nodeF_X" type="radio" name="nodeF" value="X">
-        </td>
-         <td>
-          <input id="nodeF_Y" type="radio" name="nodeF" value="Y">
-        </td>
-         <td>
-          <input id="nodeF_E" type="radio" name="nodeF" value="E">
-        </td>
-         <td>
-          <input id="nodeF_C" type="radio" name="nodeF" value="C">
-        </td>
-      </tr>
+        <tr>
+          
+          <td>
+           <label>F</label>
+          </td>
+           <td>
+            <input id="nodeF_X" type="radio" name="nodeF" value="X">
+          </td>
+           <td>
+            <input id="nodeF_Y" type="radio" name="nodeF" value="Y">
+          </td>
+           <td>
+            <input id="nodeF_E" type="radio" name="nodeF" value="E">
+          </td>
+           <td>
+            <input id="nodeF_C" type="radio" name="nodeF" value="C">
+          </td>
+        </tr>
 
-      <tr>
-        
-        <td>
-         <label>G</label>
-        </td>
-         <td>
-          <input id="nodeG_X" type="radio" name="nodeG" value="X">
-        </td>
-         <td>
-          <input id="nodeG_Y" type="radio" name="nodeG" value="Y">
-        </td>
-         <td>
-          <input id="nodeG_E" type="radio" name="nodeG" value="E">
-        </td>
-         <td>
-          <input id="nodeG_C" type="radio" name="nodeG" value="C">
-        </td>
-      </tr>
+        <tr>
+          
+          <td>
+           <label>G</label>
+          </td>
+           <td>
+            <input id="nodeG_X" type="radio" name="nodeG" value="X">
+          </td>
+           <td>
+            <input id="nodeG_Y" type="radio" name="nodeG" value="Y">
+          </td>
+           <td>
+            <input id="nodeG_E" type="radio" name="nodeG" value="E">
+          </td>
+           <td>
+            <input id="nodeG_C" type="radio" name="nodeG" value="C">
+          </td>
+        </tr>
 
-      <tr>
-        
-        <td>
-         <label>H</label>
-        </td>
-         <td>
-          <input id="nodeH_X" type="radio" name="nodeH" value="X">
-        </td>
-         <td>
-          <input id="nodeH_Y" type="radio" name="nodeH" value="Y">
-        </td>
-         <td>
-          <input id="nodeH_E" type="radio" name="nodeH" value="E">
-        </td>
-         <td>
-          <input id="nodeH_C" type="radio" name="nodeH" value="C">
-        </td>
-      </tr>
+        <tr>
+          
+          <td>
+           <label>H</label>
+          </td>
+           <td>
+            <input id="nodeH_X" type="radio" name="nodeH" value="X">
+          </td>
+           <td>
+            <input id="nodeH_Y" type="radio" name="nodeH" value="Y">
+          </td>
+           <td>
+            <input id="nodeH_E" type="radio" name="nodeH" value="E">
+          </td>
+           <td>
+            <input id="nodeH_C" type="radio" name="nodeH" value="C">
+          </td>
+        </tr>
 
-      </table>
-    </div>
+        </table>
+      </div>
+      <div class="span4">
+        <p id="result"></p>
+      </div>
     <div class="row-fluid">
       <div class="span12">
         <div class="span1"></div>
@@ -1082,7 +1215,7 @@
           <button class="btn btn-info" type="button" name="submit" onClick="allPath();">Submit</button>
         </div>
         <div class="span2">
-          <button class="btn btn-info" type="button" name="submit" onClick="printPathFromTo(getNodeMarkedX(), getNodeMarkedY());">Test</button>
+          <button class="btn btn-info" type="button" name="submit" onClick="D_Separation();">Test</button>
         </div>
       </div>
     </div>
