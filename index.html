@@ -264,7 +264,14 @@
             startx = start[0] - 10;
             starty = start[1] - 6;
           }
-
+          //Direct bottom
+          else if(start[0] == end[0] && start[1] > end[1]){
+            starty = start[1] - 10;
+          }
+          //Direct top
+          else if(start[0] == end[0] && start[1] < end[1]){
+            starty = start[1] + 10;
+          }
           //On the left side
           else if(start[0] > end[0] && start[1] == end[1]){
             startx = start[0] - 10;
@@ -275,6 +282,16 @@
           //If start node is at the right side of end node
           if(start[0] > end[0] && start[1] == end[1]){
             endx = end[0] + 12;
+          }
+          //If the end node is right above
+          else if(start[0] == end[0] && start[1] > end[1]){
+            //endx = end[0] + 2;
+            endy = end[1] + 10;
+          }
+          //If the end node is right below
+          else if(start[0] == end[0] && start[1] < end[1]){
+            //endx = end[0] + 2;
+            endy = end[1] - 10;
           }
           else if(start[1] > end[1] && start[0] > end[0]){
             endy = end[1] + 10;
@@ -525,7 +542,7 @@
 
           alert("Clear");
         } 
-        if(Graph_Number < 2){
+        if(Graph_Number < 5){
           Graph_Number += 1;
         }
         else{
@@ -563,40 +580,133 @@
           edgeDH = new Edge("DH", "D", "H", false, false);
           edgeEH = new Edge("EH", "E", "H", false, false);
           EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH]; 
-      }else{
-        var gap_x = 70;
-        PositionsNodeList[0] = {X: 40, Y: 20}; //A
-        PositionsNodeList[1] = {X: 180, Y: 20}; //B
-        PositionsNodeList[2] = {X: 320, Y: 20};    //C  
-        PositionsNodeList[3] = {X: 110, Y: 90}; //D
-        PositionsNodeList[4] = {X: 250, Y: 90}; //E
-        PositionsNodeList[5] = {X: 40, Y: 160}; //F
-        PositionsNodeList[6] = {X: 180, Y: 160}; //G
-        PositionsNodeList[7] = {X: 320, Y: 160}; //H
+        }else if (Graph_Number == 2){
+          var gap_x = 70;
+          PositionsNodeList[0] = {X: 40, Y: 20}; //A
+          PositionsNodeList[1] = {X: 180, Y: 20}; //B
+          PositionsNodeList[2] = {X: 320, Y: 20};    //C  
+          PositionsNodeList[3] = {X: 110, Y: 90}; //D
+          PositionsNodeList[4] = {X: 250, Y: 90}; //E
+          PositionsNodeList[5] = {X: 40, Y: 160}; //F
+          PositionsNodeList[6] = {X: 180, Y: 160}; //G
+          PositionsNodeList[7] = {X: 320, Y: 160}; //H
 
-        nodeA = new Node("A", PositionsNodeList[0].X, PositionsNodeList[0].Y, 2, false,  false, false, false);
-        nodeB = new Node("B", PositionsNodeList[1].X, PositionsNodeList[1].Y, 2, false, false, false, false);
-        nodeC = new Node("C", PositionsNodeList[2].X, PositionsNodeList[2].Y, 2, false,  false, false, false);
-        nodeD = new Node("D", PositionsNodeList[3].X, PositionsNodeList[3].Y, 2, false, false, false, false);
-        nodeE = new Node("E", PositionsNodeList[4].X, PositionsNodeList[4].Y, 2, false, false, false, false);
-        nodeF = new Node("F", PositionsNodeList[5].X, PositionsNodeList[5].Y, 2, false, false, false, false);
-        nodeG = new Node("G", PositionsNodeList[6].X, PositionsNodeList[6].Y, 2, false,  false, false, false);
-        nodeH = new Node("H", PositionsNodeList[7].X, PositionsNodeList[7].Y, 2, false,  false, false, false);
+          nodeA = new Node("A", PositionsNodeList[0].X, PositionsNodeList[0].Y, 2, false,  false, false, false);
+          nodeB = new Node("B", PositionsNodeList[1].X, PositionsNodeList[1].Y, 2, false, false, false, false);
+          nodeC = new Node("C", PositionsNodeList[2].X, PositionsNodeList[2].Y, 2, false,  false, false, false);
+          nodeD = new Node("D", PositionsNodeList[3].X, PositionsNodeList[3].Y, 2, false, false, false, false);
+          nodeE = new Node("E", PositionsNodeList[4].X, PositionsNodeList[4].Y, 2, false, false, false, false);
+          nodeF = new Node("F", PositionsNodeList[5].X, PositionsNodeList[5].Y, 2, false, false, false, false);
+          nodeG = new Node("G", PositionsNodeList[6].X, PositionsNodeList[6].Y, 2, false,  false, false, false);
+          nodeH = new Node("H", PositionsNodeList[7].X, PositionsNodeList[7].Y, 2, false,  false, false, false);
 
-        NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH];
-        edgeAD = new Edge("AD", "A", "D", false, false);  
-        edgeBD = new Edge("BD", "B", "D", false, false);
-        edgeBE = new Edge("BE", "B", "E", false, false);
-        edgeCE = new Edge("CE", "C", "E", false, false);
-        edgeFD = new Edge("FD", "F", "D", false, false);
-        edgeDG = new Edge("DG", "D" ,"G", false, false);
-        edgeEG = new Edge("EG", "E", "G", false, false);
-        edgeHE = new Edge("HE", "H", "E", false, false);
-        EdgeList = [edgeAD, edgeBD, edgeBE, edgeCE, edgeFD, edgeDG, edgeEG,edgeHE]; 
+          NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH];
+          edgeAD = new Edge("AD", "A", "D", false, false);  
+          edgeBD = new Edge("BD", "B", "D", false, false);
+          edgeBE = new Edge("BE", "B", "E", false, false);
+          edgeCE = new Edge("CE", "C", "E", false, false);
+          edgeFD = new Edge("FD", "F", "D", false, false);
+          edgeDG = new Edge("DG", "D" ,"G", false, false);
+          edgeEG = new Edge("EG", "E", "G", false, false);
+          edgeHE = new Edge("HE", "H", "E", false, false);
+          EdgeList = [edgeAD, edgeBD, edgeBE, edgeCE, edgeFD, edgeDG, edgeEG,edgeHE]; 
 
 
-        alert("Changing Graph");
-      }
+          alert("Changing Graph");
+        }
+        else if(Graph_Number == 3){
+          var gap = 90
+          PositionsNodeList[0] = {X: 40, Y: 50}; //A
+          PositionsNodeList[1] = {X: 130, Y: 50}; //B
+          PositionsNodeList[2] = {X: 210, Y: 50};    //C  
+          PositionsNodeList[3] = {X: 290, Y: 50}; //D
+          PositionsNodeList[4] = {X: 40, Y: 150}; //E
+          PositionsNodeList[5] = {X: 130, Y: 150}; //F
+          PositionsNodeList[6] = {X: 210, Y: 150}; //G
+          PositionsNodeList[7] = {X: 290, Y: 150}; //H
+
+          nodeA = new Node("A", PositionsNodeList[0].X, PositionsNodeList[0].Y, 2, false,  false, false, false);
+          nodeB = new Node("B", PositionsNodeList[1].X, PositionsNodeList[1].Y, 2, false, false, false, false);
+          nodeC = new Node("C", PositionsNodeList[2].X, PositionsNodeList[2].Y, 2, false,  false, false, false);
+          nodeD = new Node("D", PositionsNodeList[3].X, PositionsNodeList[3].Y, 2, false, false, false, false);
+          nodeE = new Node("E", PositionsNodeList[4].X, PositionsNodeList[4].Y, 2, false, false, false, false);
+          nodeF = new Node("F", PositionsNodeList[5].X, PositionsNodeList[5].Y, 2, false, false, false, false);
+          nodeG = new Node("G", PositionsNodeList[6].X, PositionsNodeList[6].Y, 2, false,  false, false, false);
+          nodeH = new Node("H", PositionsNodeList[7].X, PositionsNodeList[7].Y, 2, false,  false, false, false);
+
+          NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH];
+          edgeEA = new Edge("EA", "E", "A", false, false);  
+          edgeFB = new Edge("FB", "F", "B", false, false);
+          edgeGC = new Edge("GC", "G", "C", false, false);
+          edgeHD = new Edge("HD", "H", "D", false, false);
+          edgeEF = new Edge("EF", "E", "F", false, false);
+          edgeFG = new Edge("FG", "F" ,"G", false, false);
+          edgeGH = new Edge("GH", "G", "H", false, false);
+          EdgeList = [edgeEA, edgeFB, edgeGC, edgeHD, edgeEF, edgeFG, edgeGH]; 
+        }
+        else if(Graph_Number == 4){
+          PositionsNodeList[0] = {X: 220, Y: 20}; //A
+          PositionsNodeList[1] = {X: 40, Y: 80}; //B
+          PositionsNodeList[2] = {X: 400, Y: 80};    //C  
+          PositionsNodeList[3] = {X: 130, Y: 150}; //D
+          PositionsNodeList[4] = {X: 310, Y: 150}; //E
+          PositionsNodeList[5] = {X: 40, Y: 200}; //F
+          PositionsNodeList[6] = {X: 220, Y: 200}; //G
+          PositionsNodeList[7] = {X: 400, Y: 200}; //H
+
+          nodeA = new Node("A", PositionsNodeList[0].X, PositionsNodeList[0].Y, 2, false,  false, false, false);
+          nodeB = new Node("B", PositionsNodeList[1].X, PositionsNodeList[1].Y, 2, false, false, false, false);
+          nodeC = new Node("C", PositionsNodeList[2].X, PositionsNodeList[2].Y, 2, false,  false, false, false);
+          nodeD = new Node("D", PositionsNodeList[3].X, PositionsNodeList[3].Y, 2, false, false, false, false);
+          nodeE = new Node("E", PositionsNodeList[4].X, PositionsNodeList[4].Y, 2, false, false, false, false);
+          nodeF = new Node("F", PositionsNodeList[5].X, PositionsNodeList[5].Y, 2, false, false, false, false);
+          nodeG = new Node("G", PositionsNodeList[6].X, PositionsNodeList[6].Y, 2, false,  false, false, false);
+          nodeH = new Node("H", PositionsNodeList[7].X, PositionsNodeList[7].Y, 2, false,  false, false, false);
+
+          NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH];
+          edgeAG = new Edge("AG", "A", "G", false, false);  
+          edgeAB = new Edge("AB", "A", "B", false, false);
+          edgeBD = new Edge("BD", "B", "D", false, false);
+          edgeDG = new Edge("DG", "D", "G", false, false);
+          edgeDF = new Edge("DF", "D", "F", false, false);
+          edgeCE = new Edge("CE", "C" ,"E", false, false);
+          edgeEH = new Edge("EH", "E", "H", false, false);
+          edgeEG = new Edge("EG", "E", "G", false, false);
+
+          EdgeList = [edgeAG, edgeAB, edgeBD, edgeDG, edgeDF, edgeCE, edgeEH, edgeEG]; 
+        }
+        else if(Graph_Number == 5){
+          PositionsNodeList[0] = {X: 100, Y: 40}; //A
+          PositionsNodeList[1] = {X: 260, Y: 40}; //B
+          PositionsNodeList[2] = {X: 20, Y: 100};    //C  
+          PositionsNodeList[3] = {X: 180, Y: 100}; //D
+          PositionsNodeList[4] = {X: 340, Y: 100}; //E
+          PositionsNodeList[5] = {X: 100, Y: 160}; //F
+          PositionsNodeList[6] = {X: 260, Y: 160}; //G
+          PositionsNodeList[7] = {X: 420, Y: 160}; //H
+
+          nodeA = new Node("A", PositionsNodeList[0].X, PositionsNodeList[0].Y, 2, false,  false, false, false);
+          nodeB = new Node("B", PositionsNodeList[1].X, PositionsNodeList[1].Y, 2, false, false, false, false);
+          nodeC = new Node("C", PositionsNodeList[2].X, PositionsNodeList[2].Y, 2, false,  false, false, false);
+          nodeD = new Node("D", PositionsNodeList[3].X, PositionsNodeList[3].Y, 2, false, false, false, false);
+          nodeE = new Node("E", PositionsNodeList[4].X, PositionsNodeList[4].Y, 2, false, false, false, false);
+          nodeF = new Node("F", PositionsNodeList[5].X, PositionsNodeList[5].Y, 2, false, false, false, false);
+          nodeG = new Node("G", PositionsNodeList[6].X, PositionsNodeList[6].Y, 2, false,  false, false, false);
+          nodeH = new Node("H", PositionsNodeList[7].X, PositionsNodeList[7].Y, 2, false,  false, false, false);
+
+          NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH];
+          edgeAF = new Edge("AF", "A", "F", false, false);  
+          edgeAD = new Edge("AD", "A", "D", false, false);
+          edgeCF = new Edge("CF", "C", "F", false, false);
+          edgeDF = new Edge("DF", "D", "F", false, false);
+          edgeDG = new Edge("DG", "D", "G", false, false);
+          edgeBD = new Edge("BD", "B" ,"D", false, false);
+          edgeBG = new Edge("BG", "B", "G", false, false);
+          edgeEG = new Edge("EG", "E", "G", false, false);
+          edgeEH = new Edge("EH", "E", "H", false, false);
+
+          EdgeList = [edgeAF, edgeAD, edgeCF, edgeDF, edgeDG, edgeBD, edgeBG, edgeEG, edgeEH]; 
+        }
         init();
       }
 
@@ -1319,7 +1429,6 @@
 
       }
 
-
       function highlightPath(str){
         if(Graph_Number == 1){
           edgeAC = new Edge("AC", "A", "C", false, false);  
@@ -1334,16 +1443,44 @@
         }
         else if(Graph_Number == 2){
           edgeAD = new Edge("AD", "A", "D", false, false);  
-         edgeBD = new Edge("BD", "B", "D", false, false);
+          edgeBD = new Edge("BD", "B", "D", false, false);
           edgeBE = new Edge("BE", "B", "E", false, false);
-        edgeCE = new Edge("CE", "C", "E", false, false);
-        edgeFD = new Edge("FD", "F", "D", false, false);
-        edgeDG = new Edge("DG", "D" ,"G", false, false);
-        edgeEG = new Edge("EG", "E", "G", false, false);
-        edgeHE = new Edge("HE", "H", "E", false, false);
-        EdgeList = [edgeAD, edgeBD, edgeBE, edgeCE, edgeFD, edgeDG, edgeEG,edgeHE]; 
-
-
+          edgeCE = new Edge("CE", "C", "E", false, false);
+          edgeFD = new Edge("FD", "F", "D", false, false);
+          edgeDG = new Edge("DG", "D" ,"G", false, false);
+          edgeEG = new Edge("EG", "E", "G", false, false);
+          edgeHE = new Edge("HE", "H", "E", false, false);
+          EdgeList = [edgeAD, edgeBD, edgeBE, edgeCE, edgeFD, edgeDG, edgeEG,edgeHE]; 
+        }else if(Graph_Number == 3){
+          edgeEA = new Edge("EA", "E", "A", false, false);  
+          edgeFB = new Edge("FB", "F", "B", false, false);
+          edgeGC = new Edge("GC", "G", "C", false, false);
+          edgeHD = new Edge("HD", "H", "D", false, false);
+          edgeEF = new Edge("EF", "E", "F", false, false);
+          edgeFG = new Edge("FG", "F" ,"G", false, false);
+          edgeGH = new Edge("GH", "G", "H", false, false);
+          EdgeList = [edgeEA, edgeFB, edgeGC, edgeHD, edgeEF, edgeFG, edgeGH]; 
+        }else if(Graph_Number == 4){
+          edgeAG = new Edge("AG", "A", "G", false, false);  
+          edgeAB = new Edge("AB", "A", "B", false, false);
+          edgeBD = new Edge("BD", "B", "D", false, false);
+          edgeDG = new Edge("DG", "D", "G", false, false);
+          edgeDF = new Edge("DF", "D", "F", false, false);
+          edgeCE = new Edge("CE", "C" ,"E", false, false);
+          edgeEH = new Edge("EH", "E", "H", false, false);
+          edgeEG = new Edge("EG", "E", "G", false, false);
+          EdgeList = [edgeAG, edgeAB, edgeBD, edgeDG, edgeDF, edgeCE, edgeEH, edgeEG]; 
+        }else if(Graph_Number == 5){
+          edgeAF = new Edge("AF", "A", "F", false, false);  
+          edgeAD = new Edge("AD", "A", "D", false, false);
+          edgeCF = new Edge("CF", "C", "F", false, false);
+          edgeDF = new Edge("DF", "D", "F", false, false);
+          edgeDG = new Edge("DG", "D", "G", false, false);
+          edgeBD = new Edge("BD", "B" ,"D", false, false);
+          edgeBG = new Edge("BG", "B", "G", false, false);
+          edgeEG = new Edge("EG", "E", "G", false, false);
+          edgeEH = new Edge("EH", "E", "H", false, false);
+          EdgeList = [edgeAF, edgeAD, edgeCF, edgeDF, edgeDG, edgeBD, edgeBG, edgeEG, edgeEH]; 
         }
         //This part is for highlighting the edges
         for(var j = 0; j < str.length; j++){
@@ -1358,10 +1495,9 @@
 
 
     </script>
-    <!--<div class="span12">
-       <p class="text-info">black is for normal, red is for evidence, blue for X set, and green for Y set</p>
-    </div>-->
-    <br/>
+    <div class="span12">
+       <p class="text-info">black is for normal, grey node is for evidence, blue for X set, and green for Y set</p>
+    </div>
     <div class="span12">
       <div class="span5">
       <table class="table table-bordered table-condensed table-striped table-hover">
