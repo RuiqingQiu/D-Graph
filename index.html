@@ -4,7 +4,9 @@
     <style>
       td{
         text-align: center;
+        width:50px;
       }
+
     </style>
 
     <link href="css/bootstrap.css" rel="stylesheet" media="screen">
@@ -22,9 +24,12 @@
       </div>
     </div>
 
-
-    <canvas id="viewport" width="1000" height="400"></canvas>
-
+    <div class="span6">
+      <canvas id="viewport" width="450" height="250"></canvas>
+    </div>
+    <div class="span4 offset1">
+      <img src="rules.png"/>
+    </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
     
@@ -58,14 +63,24 @@
 
 
       var PositionsNodeList = [];
-      PositionsNodeList[0] = {X: 350, Y: 100}; 
-      PositionsNodeList[1] = {X: 50, Y: 200}; 
-      PositionsNodeList[2] = {X: 250, Y: 200};      
-      PositionsNodeList[3] = {X: 450, Y: 200}; 
-      PositionsNodeList[4] = {X: 650, Y: 200}; 
-      PositionsNodeList[5] = {X: 150, Y: 300}; 
-      PositionsNodeList[6] = {X: 350, Y: 300}; 
-      PositionsNodeList[7] = {X: 550, Y: 300}; 
+      PositionsNodeList[0] = {X: 350, Y: 100}; //A
+      PositionsNodeList[1] = {X: 25, Y: 150}; //B
+      PositionsNodeList[2] = {X: 250, Y: 200}; //C     
+      PositionsNodeList[3] = {X: 450, Y: 200}; //D
+      PositionsNodeList[4] = {X: 650, Y: 200}; //E
+      PositionsNodeList[5] = {X: 75, Y: 175}; //F
+      PositionsNodeList[6] = {X: 125, Y: 175}; //G
+      PositionsNodeList[7] = {X: 175, Y: 175}; //H
+
+      edgeAC = new Edge("AC", "A", "C", false, false);  
+      edgeCF = new Edge("CF", "C", "F", false, false);
+      edgeBF = new Edge("BF", "B", "F", false, false);
+      edgeCG = new Edge("CG", "C", "G", false, false);
+      edgeAD = new Edge("AD", "A", "D", false, false);
+      edgeDG = new Edge("DG", "D" ,"G", false, false);
+      edgeDH = new Edge("DH", "D", "H", false, false);
+      edgeEH = new Edge("EH", "E", "H", false, false);
+      EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH]; 
       
 
       /**
@@ -117,7 +132,7 @@
         // if the canvas is ever resized, screenSize should be called again with
         // the new dimensions
         particleSystem.screenSize(canvas.width, canvas.height) 
-        particleSystem.screenPadding(100) // leave an extra 80px of whitespace per side
+        particleSystem.screenPadding(75) // leave an extra 80px of whitespace per side
         
         // set up some event handlers to allow for node-dragging
         that.initMouseHandling()
@@ -172,20 +187,31 @@
 
           // draw a rectangle centered at pt
           var w = 10
-          if(node.data.evidence)
-            ctx.fillStyle = "red"
-          else if(node.data.target)
-            ctx.fillStyle = "blue"
-          else if(node.data.targetY)
-            ctx.fillStyle = "green"
-          else
-            ctx.fillStyle = "black"
+          if(node.data.evidence){
+            ctx.strokeStyle = "black";
+            ctx.fillStyle = "#cccccc";
+          }
+          else if(node.data.target){
+            ctx.strokeStyle = "blue";
+            ctx.fillStyle = "white";
+          }
+          else if(node.data.targetY){
+            ctx.strokeStyle = "green";
+            ctx.fillStyle = "white";
+
+          }
+          else{
+            ctx.strokeStyle = "black";
+            ctx.fillStyle = "white";
+          }
           //ctx.fillStyle = (node.data.evidence) ? "red" : "black"
           //ctx.fillRect(pt.x-w/2, pt.y-w/2, w,w)
           ctx.beginPath()
           ctx.arc(node.p.x, node.p.y, 10, 0, 2*Math.PI);
-          ctx.fillText(node.data.name, node.p.x+10, node.p.y-3);
           ctx.fill();
+          ctx.fillStyle ="black";
+          ctx.fillText(node.data.name, node.p.x+15, node.p.y-3);
+          ctx.stroke();
           nodeBoxes[node.name] = [node.p.x, node.p.y, 22, 15]
         })   
 
@@ -204,17 +230,46 @@
           var currentEdge = findEdgeByName(edge.data.name)
           if(currentEdge != null){
             if(currentEdge.highlighted)
-              ctx.strokeStyle = "#99FFFF"
+              ctx.strokeStyle = "#E8A317";
             else
-              ctx.strokeStyle = "#cccccc"
+              ctx.strokeStyle = "#cccccc";
           }
           else{
-            ctx.strokeStyle = "#cccccc"
+            ctx.strokeStyle = "#cccccc";
           }
           
           ctx.fillStyle = null
+          var startx = start[0];
+          var starty = start[1];
+          //The node is top right of the end node
+          if(start[0] > end[0] && start[1] < end[1]){
+            startx = start[0] - 6;
+            starty = start[1] + 6;
+          }
+          //Top left
+          else if(start[0] < end[0] && start[1] < end[1]){
+            startx = start[0] + 8;
+            starty = start[1] + 6;
+          }
+          //On the right side
+          else if(start[0] < end[0] && start[1] == end[1]){
+            startx = start[0] + 10;
+          //Bottom left
+          }else if(start[0] < end[0] && start[1] > end[1]){
+            startx = start[0] + 10;
+            starty = start[1] - 6;
+          }
+          //Bottom right
+          else if(start[0] > end[0] && start[1] > end[1]){
+            startx = start[0] - 10;
+            starty = start[1] - 6;
+          }
 
-          ctx.moveTo(start[0], start[1])//Tail
+          //On the left side
+          else if(start[0] > end[0] && start[1] == end[1]){
+            startx = start[0] - 10;
+          }
+          ctx.moveTo(startx, starty)//Tail
           var endx = end[0];
           var endy = end[1];
           //If start node is at the right side of end node
@@ -257,7 +312,7 @@
           var arrowWidth = 4 + wt;
           if(currentEdge != null){
             if(currentEdge.highlighted)
-              ctx.fillStyle = "#99FFFF";
+              ctx.fillStyle = "#E8A317";
             else
               ctx.fillStyle = "#cccccc";
           }
@@ -373,25 +428,6 @@
     var sys = arbor.ParticleSystem(0, 0, 0.5) // create the system with sensible repulsion/stiffness/friction
     sys.parameters({gravity:true}) // use center-gravity to make the graph settle nicely (ymmv)
     sys.renderer = Renderer("#viewport") // our newly created renderer will have its .init() method called shortly by sys...
-
-    
-
-
-    // add some nodes to the graph and watch it go...
-    // or, equivalently:
-    //
-    // sys.graft({
-    //   nodes:{
-    //     f:{alone:true, mass:.25}
-    //   }, 
-    //   edges:{
-    //     a:{ b:{},
-    //         c:{},
-    //         d:{},
-    //         e:{}
-    //     }
-    //   }
-    // })
     
   })
 
@@ -424,38 +460,38 @@
           EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH]; */
         //Here's for the three possible blocking path
 
-        //Rule #1, intervening cause
+        /*//Rule #1, intervening cause
         node1 = new Node("1", 720, 50, 2, false, false, false);
         node2 = new Node("2", 795, 50, 2, true, false, false);
         node3 = new Node("3", 870, 50, 2, false, false, false);
         edge12 = new Edge("12", "1", "2", false, true);
         edge23 = new Edge("23", "2", "3", false, true);
         //Rule #2, comman cause
-        node4 = new Node("4", 720, 150, 2, false, false, false);
-        node5 = new Node("5", 795, 150, 2, true, false, false);
-        node6 = new Node("6", 870, 150, 2, false, false, false);
+        node4 = new Node("4", 720, 100, 2, false, false, false);
+        node5 = new Node("5", 795, 100, 2, true, false, false);
+        node6 = new Node("6", 870, 100, 2, false, false, false);
 
         edge54 = new Edge("54", "5", "4", false, true);
         edge56 = new Edge("56", "5", "6", false, true);
         //Rule #3, no observed common effect
-        node7 = new Node("7", 720, 250, 2, false, false, false);
-        node8 = new Node("8", 795, 250, 2, false, false, false);
-        node9 = new Node("9", 870, 250, 2, false, false, false);
-        node10 = new Node("W", 760, 300, 2, false, false, false);
-        node11 = new Node("K", 835, 300, 2, false, false, false);
+        node7 = new Node("7", 720, 150, 2, false, false, false);
+        node8 = new Node("8", 795, 150, 2, false, false, false);
+        node9 = new Node("9", 870, 150, 2, false, false, false);
+        node10 = new Node("W", 760, 200, 2, false, false, false);
+        node11 = new Node("K", 835, 200, 2, false, false, false);
         
         edge78 = new Edge("78", "7", "8", false, true);
         edge98 = new Edge("98", "9", "8", false, true);
         edge8W = new Edge("8W", "8", "W", false, true);
         edge8K = new Edge("8K", "8", "K", false, true);
-
-        NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH] 
         ExampleNodeList = [node1, node2, node3, node4, node5, node6, node7, node8, node9, node10, node11];
 
 
 
         ExampleEdgeList = [edge12, edge23, edge54, edge56, edge78, edge98, edge8K, edge8W];
-
+        */
+        NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH] 
+        
         alert("init");
       }
 
@@ -500,14 +536,14 @@
          for(var i = 0; i < PositionsNodeList.length; i++){
           PositionsNodeList.pop();
          }
-         PositionsNodeList[0] = {X: 350, Y: 100}; 
-         PositionsNodeList[1] = {X: 50, Y: 200}; 
-         PositionsNodeList[2] = {X: 250, Y: 200};      
-         PositionsNodeList[3] = {X: 450, Y: 200}; 
-         PositionsNodeList[4] = {X: 650, Y: 200}; 
-         PositionsNodeList[5] = {X: 150, Y: 300}; 
-         PositionsNodeList[6] = {X: 350, Y: 300}; 
-         PositionsNodeList[7] = {X: 550, Y: 300}; 
+         PositionsNodeList[0] = {X: 210, Y: 20}; //A
+         PositionsNodeList[1] = {X: 30, Y: 90}; //B
+         PositionsNodeList[2] = {X: 150, Y: 90};   //C   
+         PositionsNodeList[3] = {X: 270, Y: 90}; //D
+         PositionsNodeList[4] = {X: 390, Y: 90}; //E
+         PositionsNodeList[5] = {X: 90, Y: 160}; //F
+         PositionsNodeList[6] = {X: 210, Y: 160}; //G
+         PositionsNodeList[7] = {X: 330, Y: 160}; //H
           nodeA = new Node("A", PositionsNodeList[0].X, PositionsNodeList[0].Y, 2, false,  false, false, false);
           nodeB = new Node("B", PositionsNodeList[1].X, PositionsNodeList[1].Y, 2, false, false, false, false);
           nodeC = new Node("C", PositionsNodeList[2].X, PositionsNodeList[2].Y, 2, false,  false, false, false);
@@ -528,14 +564,15 @@
           edgeEH = new Edge("EH", "E", "H", false, false);
           EdgeList = [edgeAC, edgeCF, edgeBF, edgeCG, edgeAD, edgeDG, edgeDH,edgeEH]; 
       }else{
-        PositionsNodeList[0] = {X: 100, Y: 100}; 
-        PositionsNodeList[1] = {X: 250, Y: 100}; 
-        PositionsNodeList[2] = {X: 400, Y: 100};      
-        PositionsNodeList[3] = {X: 175, Y: 200}; 
-        PositionsNodeList[4] = {X: 325, Y: 200}; 
-        PositionsNodeList[5] = {X: 100, Y: 300}; 
-        PositionsNodeList[6] = {X: 250, Y: 300}; 
-        PositionsNodeList[7] = {X: 400, Y: 300}; 
+        var gap_x = 70;
+        PositionsNodeList[0] = {X: 40, Y: 20}; //A
+        PositionsNodeList[1] = {X: 180, Y: 20}; //B
+        PositionsNodeList[2] = {X: 320, Y: 20};    //C  
+        PositionsNodeList[3] = {X: 110, Y: 90}; //D
+        PositionsNodeList[4] = {X: 250, Y: 90}; //E
+        PositionsNodeList[5] = {X: 40, Y: 160}; //F
+        PositionsNodeList[6] = {X: 180, Y: 160}; //G
+        PositionsNodeList[7] = {X: 320, Y: 160}; //H
 
         nodeA = new Node("A", PositionsNodeList[0].X, PositionsNodeList[0].Y, 2, false,  false, false, false);
         nodeB = new Node("B", PositionsNodeList[1].X, PositionsNodeList[1].Y, 2, false, false, false, false);
@@ -560,32 +597,6 @@
 
         alert("Changing Graph");
       }
-        //Rule #1, intervening cause
-        node1 = new Node("1", 720, 50, 2, false, false, false);
-        node2 = new Node("2", 795, 50, 2, true, false, false);
-        node3 = new Node("3", 870, 50, 2, false, false, false);
-        edge12 = new Edge("12", "1", "2", false, true);
-        edge23 = new Edge("23", "2", "3", false, true);
-        //Rule #2, comman cause
-        node4 = new Node("4", 720, 150, 2, false, false, false);
-        node5 = new Node("5", 795, 150, 2, true, false, false);
-        node6 = new Node("6", 870, 150, 2, false, false, false);
-
-        edge54 = new Edge("54", "5", "4", false, true);
-        edge56 = new Edge("56", "5", "6", false, true);
-        //Rule #3, no observed common effect
-        node7 = new Node("7", 720, 250, 2, false, false, false);
-        node8 = new Node("8", 795, 250, 2, false, false, false);
-        node9 = new Node("9", 870, 250, 2, false, false, false);
-        node10 = new Node("W", 760, 300, 2, false, false, false);
-        node11 = new Node("K", 835, 300, 2, false, false, false);
-        
-        edge78 = new Edge("78", "7", "8", false, true);
-        edge98 = new Edge("98", "9", "8", false, true);
-        edge8W = new Edge("8W", "8", "W", false, true);
-        edge8K = new Edge("8K", "8", "K", false, true);
-
-        ExampleNodeList = [node1, node2, node3, node4, node5, node6, node7, node8, node9, node10, node11];
         init();
       }
 
@@ -1119,9 +1130,6 @@
           }
         }
         
-       
-        
-        
       }
       function adjacentNodes(nodeX){
         var adjacent = [];
@@ -1219,14 +1227,18 @@
             if(visited[index] == currentEdge.from 
               && visited[index+1] == currentEdge.to 
               && visited[index+2] == EdgeTmp[index+1].to 
-              && findNodeByName(visited[index+1]).evidence == true)
+              && findNodeByName(visited[index+1]).evidence == true
+              && findNodeByName(visited[index]).evidence == false
+              && findNodeByName(visited[index+2]).evidence == false)
             {
               return "Independent by Rule#1";
             }
             else if(visited[index] == currentEdge.to 
               && visited[index+1] == currentEdge.from
               && visited[index+2] == EdgeTmp[index+1].from
-              && findNodeByName(visited[index+1]).evidence == true){
+              && findNodeByName(visited[index+1]).evidence == true
+              && findNodeByName(visited[index]).evidence == false
+              && findNodeByName(visited[index+2]).evidence == false){
               return "Independent by Rule#1";
             }
             else{
@@ -1247,7 +1259,9 @@
             if(visited[index] == currentEdge.to 
               && visited[index+1] == currentEdge.from 
               && visited[index+2] == EdgeTmp[index+1].to 
-              && findNodeByName(visited[index+1]).evidence == true)
+              && findNodeByName(visited[index+1]).evidence == true
+              && findNodeByName(visited[index]).evidence == false
+              && findNodeByName(visited[index+2]).evidence == false)
             {
               return "Independent by Rule#2";
             }
@@ -1344,10 +1358,12 @@
 
 
     </script>
-    <div class="span12">
+    <!--<div class="span12">
        <p class="text-info">black is for normal, red is for evidence, blue for X set, and green for Y set</p>
-    </div>
-    <div class="span6">
+    </div>-->
+    <br/>
+    <div class="span12">
+      <div class="span5">
       <table class="table table-bordered table-condensed table-striped table-hover">
         <tr>
           <th>Node</th>
@@ -1507,20 +1523,19 @@
       <div class="span4">
         <p id="result"></p>
       </div>
+      </div>
+      
     <div class="row-fluid">
       <div class="span12">
-        <div class="span1"></div>
-        <div class="span1">
+
+        <div class="span1 offset1">
           <button class="btn btn-primary" type="button" onclick="init();">Start</button>
         </div>
-        <div class="span1">
-          <button class="btn btn-success" type="button" onclick="update();">Refresh</button>
+        <div class="span2">
+          <button class="btn  btn-info" type="button" name="submit" onClick="changeGraph();">Next Graph</button>
         </div>
         <div class="span2">
-          <button class="btn btn-info" type="button" name="submit" onClick="changeGraph();">Next Graph</button>
-        </div>
-        <div class="span2">
-          <button class="btn btn-info" type="button" name="submit" onClick="D_Separation();">Test</button>
+          <button class="btn btn-success" type="button" name="submit" onClick="update();D_Separation();">Get Path</button>
         </div>
       </div>
     </div>
