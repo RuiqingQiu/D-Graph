@@ -6,31 +6,17 @@
         text-align: center;
         width:50px;
       }
-
+      ul
+      {
+        list-style-type: none;
+      }
     </style>
 
     <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="css/hover.css" rel="stylesheet" media="all">
   </head>
   <body>
-    <!-- A navbar -->
-    <div class="navbar">
-      <div class="navbar-inner">
-        <a class="brand" href="#">CSE 150 D-Separation Graph</a>
-        <ul class="nav">
-          <li class="active"><a href="#"><i class="icon-home"></i> Home</a></li>
-          <li><a href="#"><i class="icon-book"></i> Course Home Page</a></li>
-          <li><a href="#"><i class="icon-search"></i> Useful Links</a></li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="span6">
-      <canvas id="viewport" width="450" height="250"></canvas>
-    </div>
-    <div class="span4 offset1">
-      <img src="rules.png"/>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
     <script src="js/bootstrap.js"></script>
     
     <script src="lib/arbor.js"></script>
@@ -230,7 +216,7 @@
           var currentEdge = findEdgeByName(edge.data.name)
           if(currentEdge != null){
             if(currentEdge.highlighted)
-              ctx.strokeStyle = "#E8A317";
+              ctx.strokeStyle = "#FF6666";
             else
               ctx.strokeStyle = "#cccccc";
           }
@@ -329,7 +315,7 @@
           var arrowWidth = 4 + wt;
           if(currentEdge != null){
             if(currentEdge.highlighted)
-              ctx.fillStyle = "#E8A317";
+              ctx.fillStyle = "#FF3300";
             else
               ctx.fillStyle = "#cccccc";
           }
@@ -509,10 +495,10 @@
         */
         NodeList = [nodeA, nodeB, nodeC, nodeD, nodeE, nodeF, nodeG, nodeH] 
         
-        alert("init");
+        //alert("init");
       }
 
-      function changeGraph(){   
+      function changeGraph(number){   
         if(Graph_Number == 0){
 
         }else{
@@ -540,14 +526,15 @@
 
           particleSystem.pruneNode("H");
 
-          alert("Clear");
+          //alert("Clear");
         } 
-        if(Graph_Number < 5){
+        /*if(Graph_Number < 5){
           Graph_Number += 1;
         }
         else{
           Graph_Number = 1;
-        }
+        }*/
+        Graph_Number = number;
         if(Graph_Number == 1){
          //Here's for the three possible blocking path
          for(var i = 0; i < PositionsNodeList.length; i++){
@@ -612,7 +599,7 @@
           EdgeList = [edgeAD, edgeBD, edgeBE, edgeCE, edgeFD, edgeDG, edgeEG,edgeHE]; 
 
 
-          alert("Changing Graph");
+          //alert("Changing Graph");
         }
         else if(Graph_Number == 3){
           var gap = 90
@@ -1495,9 +1482,46 @@
 
 
     </script>
-    <div class="span12">
-       <p class="text-info">black is for normal, grey node is for evidence, blue for X set, and green for Y set</p>
+    <!-- A navbar -->
+    <div class="navbar">
+      <div class="navbar-inner">
+        <a class="brand" href="#">CSE 150 D-Separation Graph</a>
+        <ul class="nav">
+          <li class="active"><a href="#"><i class="icon-home"></i> Home</a></li>
+          <li><a href="#"><i class="icon-book"></i> Course Home Page</a></li>
+          <li><a href="#"><i class="icon-search"></i> Useful Links</a></li>
+        </ul>
+      </div>
     </div>
+    <div class="row-fluid">
+      <div class="span5">
+        <canvas id="viewport" width="450" height="250"></canvas>
+      </div>
+      <div class="span2">
+        <img src="rules.png"/>
+      </div>
+
+      <div class="span4">
+        <ul>
+          <li> 
+            <img width="140px" height="140px" class="img-polaroid push" src="graphs/1.png" onclick="changeGraph(1);"/>
+            <img width="140px" height="140px" class="img-polaroid push" src="graphs/2.png" onclick="changeGraph(2);"/>
+          </li>
+          <li> 
+            <img width="140px" height="140px" class="img-polaroid push" src="graphs/3.png" onclick="changeGraph(3);"/>
+            <img width="140px" height="140px" class="img-polaroid push" src="graphs/4.png" onclick="changeGraph(4);"/>
+          </li>
+          <li> 
+            <img width="140px" height="140px" class="img-polaroid push" src="graphs/5.png" onclick="changeGraph(5);"/>
+          </li>
+
+        </ul>
+    </div>
+   
+
+    <!--<div class="span12">
+       <p class="text-info">black is for normal, grey node is for evidence, blue for X set, and green for Y set</p>
+    </div>-->
     <div class="span12">
       <div class="span5">
       <table class="table table-bordered table-condensed table-striped table-hover">
@@ -1663,14 +1687,15 @@
       
     <div class="row-fluid">
       <div class="span12">
-
+        <!--
         <div class="span1 offset1">
           <button class="btn btn-primary" type="button" onclick="init();">Start</button>
         </div>
         <div class="span2">
           <button class="btn  btn-info" type="button" name="submit" onClick="changeGraph();">Next Graph</button>
         </div>
-        <div class="span2">
+      -->
+        <div class="span2 offset2">
           <button class="btn btn-success" type="button" name="submit" onClick="update();D_Separation();">Get Path</button>
         </div>
       </div>
