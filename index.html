@@ -1,6 +1,6 @@
 <html>
   <head>
-    <title></title>
+    <title>CSE 150 Demo</title>
     <style>
       td{
         text-align: center;
@@ -24,6 +24,7 @@
    <!-- <script src="main.js"></script>--> 
     <script>
 
+      var image_clicked = false;
       var Graph_Number = 0;
       //Declare all the variables
       var nodeA;
@@ -47,16 +48,18 @@
       var edgeDH;
       var edgeEH;
 
+      var print_path_result = "";
+
 
       var PositionsNodeList = [];
-      PositionsNodeList[0] = {X: 350, Y: 100}; //A
-      PositionsNodeList[1] = {X: 25, Y: 150}; //B
-      PositionsNodeList[2] = {X: 250, Y: 200}; //C     
-      PositionsNodeList[3] = {X: 450, Y: 200}; //D
-      PositionsNodeList[4] = {X: 650, Y: 200}; //E
-      PositionsNodeList[5] = {X: 75, Y: 175}; //F
-      PositionsNodeList[6] = {X: 125, Y: 175}; //G
-      PositionsNodeList[7] = {X: 175, Y: 175}; //H
+      PositionsNodeList[0] = {X: 210, Y: 20}; //A
+      PositionsNodeList[1] = {X: 30, Y: 90}; //B
+      PositionsNodeList[2] = {X: 150, Y: 90};   //C   
+      PositionsNodeList[3] = {X: 270, Y: 90}; //D
+      PositionsNodeList[4] = {X: 390, Y: 90}; //E
+      PositionsNodeList[5] = {X: 90, Y: 160}; //F
+      PositionsNodeList[6] = {X: 210, Y: 160}; //G
+      PositionsNodeList[7] = {X: 330, Y: 160}; //H
 
       edgeAC = new Edge("AC", "A", "C", false, false);  
       edgeCF = new Edge("CF", "C", "F", false, false);
@@ -92,6 +95,7 @@
         this.name = name;
         this.from = from;
         this.to = to;
+        //Variable to control whether the path will be grey or black
         this.rule = rule;
         this.highlighted = highlighted;
        }
@@ -215,13 +219,19 @@
           ctx.lineWidth = (!isNaN(weight)) ? parseFloat(weight) : 1;
           var currentEdge = findEdgeByName(edge.data.name)
           if(currentEdge != null){
-            if(currentEdge.highlighted)
-              ctx.strokeStyle = "#FF6666";
-            else
-              ctx.strokeStyle = "#cccccc";
+            if(highlight_path){
+              if(currentEdge.highlighted)
+                ctx.strokeStyle = "#FF6666";
+
+              else
+                ctx.strokeStyle = "#cccccc";
+            }
+            else{
+              ctx.strokeStyle = "black";
+            }
           }
           else{
-            ctx.strokeStyle = "#cccccc";
+            ctx.strokeStyle = "black";
           }
           
           ctx.fillStyle = null
@@ -314,13 +324,19 @@
           var arrowLength = 12 + wt;
           var arrowWidth = 4 + wt;
           if(currentEdge != null){
-            if(currentEdge.highlighted)
-              ctx.fillStyle = "#FF3300";
-            else
-              ctx.fillStyle = "#cccccc";
+            if(highlight_path){
+              if(currentEdge.highlighted)
+                ctx.fillStyle = "#FF6666";
+
+              else
+                ctx.fillStyle = "#cccccc";
+            }
+            else{
+              ctx.fillStyle = "black";
+            }
           }
           else{
-            ctx.fillStyle = "#cccccc";
+            ctx.fillStyle = "black";
           }
           ctx.translate(endx, endy);
           ctx.rotate(Math.atan2(endy - start[1], endx - start[0]));
@@ -498,7 +514,11 @@
         //alert("init");
       }
 
-      function changeGraph(number){   
+      function changeGraph(number){
+        highlight_path = false;
+        if(!image_clicked){
+          image_clicked = true;
+        }
         if(Graph_Number == 0){
 
         }else{
@@ -1212,19 +1232,34 @@
       }
 
       function D_Separation(){
+        highlight_path = false;
         //printPathFromTo(getNodeMarkedX(), getNodeMarkedY());
-        var visited = [];
-        var end;
-        document.getElementById("result").innerHTML = "";
-        //visited[0] = getNodeMarkedX();
-        var x_list = getAllNodeMarkedX();
-        var y_list = getAllNodeMarkedY();
-        for(var i = 0; i < x_list.length; i++){
-          for(var j = 0; j < y_list.length; j++){
-            end = y_list[j];
-            visited[0] = x_list[i];
-            BreadthFirstSearch(visited, end);
+        if(!image_clicked){
+          alert("Click an image to begin");
+        }
+        else{
+          var visited = [];
+          var end;
+          print_path_result = "";
+          document.getElementById("result").innerHTML = "";
+          //visited[0] = getNodeMarkedX();
+          var x_list = getAllNodeMarkedX();
+          var y_list = getAllNodeMarkedY();
+          for(var i = 0; i < x_list.length; i++){
+            for(var j = 0; j < y_list.length; j++){
+              end = y_list[j];
+              visited[0] = x_list[i];
+              BreadthFirstSearch(visited, end);
+            }
           }
+          for(var i = 0; i < print_path_dependent_array.length; i++){
+            document.getElementById("result").innerHTML += print_path_dependent_array[i];
+          }
+           for(var i = 0; i < print_path_independent_array.length; i++){
+            document.getElementById("result").innerHTML += print_path_independent_array[i];
+          }
+          print_path_dependent_array = [];
+          print_path_independent_array = [];
         }
         
       }
@@ -1271,6 +1306,8 @@
            visited.pop();
          }
       }
+      var print_path_dependent_array = [];
+      var print_path_independent_array = [];
       function printPath(visited){       
         var str = ""
         for(var i = 0; i < visited.length; i++){
@@ -1279,11 +1316,14 @@
         var isDependent = checkRules(visited);
         var printOut =  "";
         if(isDependent.indexOf("Dependent") != -1){
-          printOut = " <b class=\"text-warning\">" + isDependent + "</b>";
+          printOut = " <b class=\"text-error\">" + isDependent + "</b>";
+          print_path_dependent_array.push("<p>Path:   <button class=\"btn\" onClick=\"highlightPath('"+str+"')\">" + str + printOut + "</button></p>");
         }else{
           printOut = " <b class=\"text-success\">" + isDependent + "</b>";
+          print_path_independent_array.push("<p>Path:   <button class=\"btn\" onClick=\"highlightPath('"+str+"')\">" + str + printOut + "</button></p>");
         }
-        var result = document.getElementById("result").innerHTML += "<button class=\"btn\" onClick=\"highlightPath('"+str+"')\">Path : " + str + printOut + "</button><br/><br/>";
+        //print_path_result += "<p>Path:   <button class=\"btn\" onClick=\"highlightPath('"+str+"')\">" + str + printOut + "</button></p>";
+        //var result = document.getElementById("result").innerHTML += "<p>Path:   <button class=\"btn\" onClick=\"highlightPath('"+str+"')\">" + str + printOut + "</button></p>";
       }
       function checkRules(visited){
         if(visited.length <= 2){
@@ -1477,10 +1517,139 @@
               EdgeList[i] = new Edge(tmpEdge.name, tmpEdge.from, tmpEdge.to, true, false);
             }
           }
+          highlight_path = true;
         }
       }
+      var highlight_path = false;
 
 
+      function updateButton(){
+        var x_set = "";
+        var y_set = "";
+        var e_set = "";
+        //Node A update
+        if(document.getElementById('nodeA_X').checked){
+          x_set += "A, ";
+        }
+        else if(document.getElementById('nodeA_Y').checked){
+          y_set += "A, "; 
+        }
+        else if(document.getElementById('nodeA_E').checked){
+          e_set += "A, "; 
+        }
+        else if(document.getElementById('nodeA_C').checked){
+          
+        }
+
+        //Node B update
+        if(document.getElementById('nodeB_X').checked){
+          x_set += "B, ";
+        }
+        else if(document.getElementById('nodeB_Y').checked){
+          y_set += "B, "; 
+        }
+        else if(document.getElementById('nodeB_E').checked){
+          e_set += "B, "; 
+        }
+        else if(document.getElementById('nodeB_C').checked){
+          
+        }
+
+
+
+        //Node C update
+        if(document.getElementById('nodeC_X').checked){
+          x_set += "C, ";
+        }
+        else if(document.getElementById('nodeC_Y').checked){
+          y_set += "C, "; 
+        }
+        else if(document.getElementById('nodeC_E').checked){
+          e_set += "C, "; 
+        }
+        else if(document.getElementById('nodeC_C').checked){
+          
+        }
+
+
+
+        //Node D update
+        if(document.getElementById('nodeD_X').checked){
+          x_set += "D, ";
+        }
+        else if(document.getElementById('nodeD_Y').checked){
+          y_set += "D, "; 
+        }
+        else if(document.getElementById('nodeD_E').checked){
+          e_set += "D, "; 
+        }
+        else if(document.getElementById('nodeD_C').checked){
+          
+        }
+
+
+        //Node E update
+        if(document.getElementById('nodeE_X').checked){
+          x_set += "E, ";
+        }
+        else if(document.getElementById('nodeE_Y').checked){
+          y_set += "E, "; 
+        }
+        else if(document.getElementById('nodeE_E').checked){
+          e_set += "E, "; 
+        }
+        else if(document.getElementById('nodeE_C').checked){
+          
+        }
+
+
+        //Node F update
+        if(document.getElementById('nodeF_X').checked){
+          x_set += "F, ";
+        }
+        else if(document.getElementById('nodeF_Y').checked){
+          y_set += "F, "; 
+        }
+        else if(document.getElementById('nodeF_E').checked){
+          e_set += "F, "; 
+        }
+        else if(document.getElementById('nodeF_C').checked){
+         
+        }
+
+        //Node G update
+        if(document.getElementById('nodeG_X').checked){
+          x_set += "G, ";
+        }
+        else if(document.getElementById('nodeG_Y').checked){
+          y_set += "G, "; 
+        }
+        else if(document.getElementById('nodeG_E').checked){
+          e_set += "G, "; 
+        }
+        else if(document.getElementById('nodeG_C').checked){
+          
+        }
+
+        //Node H update
+        if(document.getElementById('nodeH_X').checked){
+          x_set += "H, ";
+        }
+        else if(document.getElementById('nodeH_Y').checked){
+          y_set += "H, "; 
+        }
+        else if(document.getElementById('nodeH_E').checked){
+          e_set += "H, "; 
+        }
+        else if(document.getElementById('nodeH_C').checked){
+          
+        }
+        x_set = x_set.substr(0, x_set.length-2);
+        y_set = y_set.substr(0, y_set.length-2);
+        e_set = e_set.substr(0, e_set.length-2);
+        document.getElementById("start").innerHTML = 
+        "Pr( " + x_set + ", " + y_set + " | " + e_set + " ) ?= Pr( " + x_set + " | " + e_set + " ) * Pr( " + y_set + " | " + e_set + " )";
+      }
     </script>
     <!-- A navbar -->
     <div class="navbar">
@@ -1538,16 +1707,16 @@
            <label>A</label>
           </td>
            <td>
-            <input id="nodeA_X" type="radio" name="nodeA" value="X">
+            <input id="nodeA_X" type="radio" name="nodeA" value="X" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeA_Y" type="radio" name="nodeA" value="Y">
+            <input id="nodeA_Y" type="radio" name="nodeA" value="Y" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeA_E" type="radio" name="nodeA" value="E">
+            <input id="nodeA_E" type="radio" name="nodeA" value="E" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeA_C"type="radio" name="nodeA" value="C">
+            <input id="nodeA_C"type="radio" name="nodeA" value="C" onclick="updateButton();">
           </td>
         </tr>
 
@@ -1555,31 +1724,31 @@
         <tr>
           <td><label>B</label></td>
           <td>
-            <input id="nodeB_X" type="radio" name="nodeB" value="B">
+            <input id="nodeB_X" type="radio" name="nodeB" value="B" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeB_Y" type="radio" name="nodeB" value="B">
+            <input id="nodeB_Y" type="radio" name="nodeB" value="B" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeB_E" type="radio" name="nodeB" value="B">
+            <input id="nodeB_E" type="radio" name="nodeB" value="B" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeB_C" type="radio" name="nodeB" value="B">
+            <input id="nodeB_C" type="radio" name="nodeB" value="B" onclick="updateButton();">
           </td>
         </tr>
         <tr>
           <td><label>C</label></td>
           <td>
-            <input id="nodeC_X" type="radio" name="nodeC" value="C">
+            <input id="nodeC_X" type="radio" name="nodeC" value="C" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeC_Y" type="radio" name="nodeC" value="C">
+            <input id="nodeC_Y" type="radio" name="nodeC" value="C" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeC_E" type="radio" name="nodeC" value="C">
+            <input id="nodeC_E" type="radio" name="nodeC" value="C" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeC_C" type="radio" name="nodeC" value="C">
+            <input id="nodeC_C" type="radio" name="nodeC" value="C" onclick="updateButton();">
           </td>
         </tr>
 
@@ -1589,16 +1758,16 @@
            <label>D</label>
           </td>
            <td>
-            <input id="nodeD_X" type="radio" name="nodeD" value="X">
+            <input id="nodeD_X" type="radio" name="nodeD" value="X" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeD_Y" type="radio" name="nodeD" value="Y">
+            <input id="nodeD_Y" type="radio" name="nodeD" value="Y" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeD_E" type="radio" name="nodeD" value="E">
+            <input id="nodeD_E" type="radio" name="nodeD" value="E" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeD_C"type="radio" name="nodeD" value="C">
+            <input id="nodeD_C"type="radio" name="nodeD" value="C" onclick="updateButton();">
           </td>
         </tr>
 
@@ -1608,16 +1777,16 @@
            <label>E</label>
           </td>
            <td>
-            <input id="nodeE_X" type="radio" name="nodeE" value="X">
+            <input id="nodeE_X" type="radio" name="nodeE" value="X" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeE_Y" type="radio" name="nodeE" value="Y">
+            <input id="nodeE_Y" type="radio" name="nodeE" value="Y" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeE_E" type="radio" name="nodeE" value="E">
+            <input id="nodeE_E" type="radio" name="nodeE" value="E" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeE_C" type="radio" name="nodeE" value="C">
+            <input id="nodeE_C" type="radio" name="nodeE" value="C" onclick="updateButton();">
           </td>
         </tr>
 
@@ -1627,16 +1796,16 @@
            <label>F</label>
           </td>
            <td>
-            <input id="nodeF_X" type="radio" name="nodeF" value="X">
+            <input id="nodeF_X" type="radio" name="nodeF" value="X" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeF_Y" type="radio" name="nodeF" value="Y">
+            <input id="nodeF_Y" type="radio" name="nodeF" value="Y" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeF_E" type="radio" name="nodeF" value="E">
+            <input id="nodeF_E" type="radio" name="nodeF" value="E" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeF_C" type="radio" name="nodeF" value="C">
+            <input id="nodeF_C" type="radio" name="nodeF" value="C" onclick="updateButton();">
           </td>
         </tr>
 
@@ -1646,16 +1815,16 @@
            <label>G</label>
           </td>
            <td>
-            <input id="nodeG_X" type="radio" name="nodeG" value="X">
+            <input id="nodeG_X" type="radio" name="nodeG" value="X" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeG_Y" type="radio" name="nodeG" value="Y">
+            <input id="nodeG_Y" type="radio" name="nodeG" value="Y" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeG_E" type="radio" name="nodeG" value="E">
+            <input id="nodeG_E" type="radio" name="nodeG" value="E" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeG_C" type="radio" name="nodeG" value="C">
+            <input id="nodeG_C" type="radio" name="nodeG" value="C" onclick="updateButton();">
           </td>
         </tr>
 
@@ -1665,16 +1834,16 @@
            <label>H</label>
           </td>
            <td>
-            <input id="nodeH_X" type="radio" name="nodeH" value="X">
+            <input id="nodeH_X" type="radio" name="nodeH" value="X" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeH_Y" type="radio" name="nodeH" value="Y">
+            <input id="nodeH_Y" type="radio" name="nodeH" value="Y" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeH_E" type="radio" name="nodeH" value="E">
+            <input id="nodeH_E" type="radio" name="nodeH" value="E" onclick="updateButton();">
           </td>
            <td>
-            <input id="nodeH_C" type="radio" name="nodeH" value="C">
+            <input id="nodeH_C" type="radio" name="nodeH" value="C" onclick="updateButton();">
           </td>
         </tr>
 
@@ -1695,8 +1864,8 @@
           <button class="btn  btn-info" type="button" name="submit" onClick="changeGraph();">Next Graph</button>
         </div>
       -->
-        <div class="span2 offset2">
-          <button class="btn btn-success" type="button" name="submit" onClick="update();D_Separation();">Get Path</button>
+        <div class="span10 offset2">
+          <button id="start" class="btn btn-success" type="button" name="submit" onClick="update();D_Separation();">Get Path</button>
         </div>
       </div>
     </div>
